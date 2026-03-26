@@ -118,11 +118,11 @@ export default function HomePage() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-6xl md:text-8xl font-serif font-bold text-white mb-6">
-              Powering South Africa's{' '}
+              Powering South Africa&apos;s{' '}
               <span className="gradient-text">Green Energy</span> Future
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
-              The world's first integrated Open Market Energy Trading Platform enabling 
+              The world&apos;s first integrated Open Market Energy Trading Platform enabling 
               free-market exchange of green energy contracts and carbon credits.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -318,7 +318,7 @@ export default function HomePage() {
                 <span className="text-xl font-serif font-bold text-white">ESUM</span>
               </div>
               <p className="text-gray-400 text-sm">
-                Powering South Africa's Green Energy Future
+                Powering South Africa&apos;s Green Energy Future
               </p>
             </div>
             <div>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
   Zap, LayoutDashboard, TrendingUp, Leaf, Bell, Settings, LogOut, Menu, X,
-  User, Building2, Shield, CreditCard, Globe, Moon, Sun as SunIcon, Bell as BellIcon
+  User, Building2, Shield, CreditCard, Globe, Moon as MoonIcon, Sun as SunIcon, Bell as BellIcon
 } from 'lucide-react';
 
 export default function SettingsPage() {

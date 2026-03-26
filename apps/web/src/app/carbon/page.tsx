@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
   Zap, LayoutDashboard, TrendingUp, Leaf, Bell, Settings, LogOut, Menu, X,
-  Plus, Filter, ArrowUpRight, ArrowDownRight, Certificate, TreePine, Factory, Droplets
+  Plus, Filter, ArrowUpRight, ArrowDownRight, Award, TreePine, Factory, Droplets
 } from 'lucide-react';
 
 const carbonCredits = [
@@ -27,7 +27,7 @@ export default function CarbonPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const standardIcons: Record<string, any> = {
-    gold_standard: Certificate,
+    gold_standard: Award,
     verra_vcs: TreePine,
     cdm: Factory,
     sa_national: Droplets
@@ -124,7 +124,7 @@ export default function CarbonPage() {
                 </thead>
                 <tbody>
                   {carbonCredits.map((credit, index) => {
-                    const StandardIcon = standardIcons[credit.standard] || Certificate;
+                    const StandardIcon = standardIcons[credit.standard] || Award;
                     
                     return (
                       <tr key={credit.id} className="border-b border-white/5 hover:bg-white/5 transition">
@@ -204,7 +204,7 @@ export default function CarbonPage() {
                 </div>
                 <div className="p-4 bg-esum-green/10 rounded-lg">
                   <p className="text-gray-300 text-sm">
-                    By retiring {portfolio.retiredCredits.toLocaleString()} tCO2e, you've offset R {(portfolio.retiredCredits * 190).toLocaleString()} in carbon tax liability.
+                    By retiring {portfolio.retiredCredits.toLocaleString()} tCO2e, you&apos;ve offset R {(portfolio.retiredCredits * 190).toLocaleString()} in carbon tax liability.
                   </p>
                 </div>
               </div>
