@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "allowJs": true,
+    "checkJs": false,
+    "baseUrl": ".",
+    "paths": {
+      "@esum/shared-types": ["packages/shared-types/src/index.ts"],
+      "@esum/db-schema": ["packages/db-schema/src/index.ts"],
+      "@esum/utils": ["packages/utils/src/index.ts"],
+      "@esum/ai-models": ["packages/ai-models/src/index.ts"]
+    }
+  },
+  "include": ["packages/**/*", "workers/**/*", "apps/**/*", "scripts/**/*"],
+  "exclude": ["node_modules", "dist", ".next", ".wrangler"]
+}
