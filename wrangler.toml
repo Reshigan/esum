@@ -1,0 +1,112 @@
+# Root Wrangler Configuration for ESUM Energy Trading Platform
+# This defines shared Cloudflare resources across all workers
+
+name = "esum-platform"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database - Main energy trading database
+[[d1_databases]]
+binding = "DB"
+database_name = "energy_trading_db"
+database_id = "YOUR_D1_DATABASE_ID"
+
+# KV Namespaces
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "YOUR_KV_SESSIONS_ID"
+preview_id = "YOUR_KV_SESSIONS_PREVIEW_ID"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "YOUR_KV_CACHE_ID"
+preview_id = "YOUR_KV_CACHE_PREVIEW_ID"
+
+[[kv_namespaces]]
+binding = "FEATURE_FLAGS"
+id = "YOUR_KV_FEATURE_FLAGS_ID"
+preview_id = "YOUR_KV_FEATURE_FLAGS_PREVIEW_ID"
+
+# R2 Buckets
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "energy-documents"
+
+[[r2_buckets]]
+binding = "INVOICES"
+bucket_name = "energy-invoices"
+
+[[r2_buckets]]
+binding = "REPORTS"
+bucket_name = "energy-reports"
+
+# Queues
+[[queues.producers]]
+binding = "ORDER_QUEUE"
+queue = "order-processing"
+
+[[queues.producers]]
+binding = "TRADE_QUEUE"
+queue = "trade-execution"
+
+[[queues.producers]]
+binding = "SETTLEMENT_QUEUE"
+queue = "settlement-processing"
+
+[[queues.producers]]
+binding = "NOTIFICATION_QUEUE"
+queue = "notification-dispatch"
+
+[[queues.consumers]]
+queue = "order-processing"
+max_batch_size = 10
+max_retries = 3
+dead_letter_queue = "order-processing-dlq"
+
+[[queues.consumers]]
+queue = "trade-execution"
+max_batch_size = 5
+max_retries = 3
+
+[[queues.consumers]]
+queue = "settlement-processing"
+max_batch_size = 10
+max_retries = 3
+
+[[queues.consumers]]
+queue = "notification-dispatch"
+max_batch_size = 20
+max_retries = 2
+
+# Durable Objects
+[durable_objects]
+bindings = [
+  { name = "ORDER_BOOK", class_name = "OrderBook" },
+  { name = "AUCTION_MANAGER", class_name = "AuctionManager" },
+  { name = "NEGOTIATION_ROOM", class_name = "NegotiationRoom" }
+]
+
+# Vectorize Index
+[[vectorize]]
+binding = "SEARCH_INDEX"
+index_name = "esum-search-index"
+
+# Workers AI
+[ai]
+binding = "AI"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "development"
+PLATFORM_NAME = "ESUM"
+CURRENCY = "ZAR"
+GRID_EMISSION_FACTOR = "1.04"
+
+# Development configuration
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Migration configuration
+[build]
+command = "npm run build"

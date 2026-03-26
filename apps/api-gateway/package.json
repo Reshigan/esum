@@ -1,0 +1,25 @@
+{
+  "name": "api-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --env production",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "@esum/shared-types": "workspace:*",
+    "@esum/db-schema": "workspace:*",
+    "@esum/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "wrangler": "^3.28.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0",
+    "miniflare": "^3.20231218.0"
+  }
+}

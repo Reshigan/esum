@@ -1,0 +1,20 @@
+{
+  "name": "grid-integration",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@esum/shared-types": "workspace:*",
+    "@esum/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "wrangler": "^3.28.0",
+    "typescript": "^5.3.0"
+  }
+}
