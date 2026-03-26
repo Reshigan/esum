@@ -1,346 +1,152 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { 
-  Zap, 
-  LayoutDashboard, 
-  TrendingUp, 
-  Leaf, 
-  Bell, 
-  Settings, 
-  LogOut,
-  Menu,
-  X,
-  Search,
-  ArrowUpRight,
-  ArrowDownRight,
-  DollarSign,
-  Activity,
-  Sun,
-  Wind,
-  Battery,
-  Factory
-} from 'lucide-react';
-
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Markets', href: '/markets', icon: TrendingUp },
-  { name: 'Carbon', href: '/carbon', icon: Leaf },
-  { name: 'Auctions', href: '/auctions', icon: Activity },
-  { name: 'Portfolio', href: '/portfolios', icon: DollarSign },
-  { name: 'Settings', href: '/settings', icon: Settings },
-];
+import { Sidebar } from "@/components/Sidebar";
+import Link from "next/link";
 
 const stats = [
-  { name: 'Total Energy Traded', value: '2,450 MWh', change: '+12.5%', trend: 'up' },
-  { name: 'Carbon Credits', value: '1,890 tCO2e', change: '+8.2%', trend: 'up' },
-  { name: 'Active Contracts', value: '47', change: '+3', trend: 'up' },
-  { name: 'Portfolio Value', value: 'R 4.2M', change: '+5.7%', trend: 'up' },
+  { name: "Total Energy Traded", value: "2,450", unit: "MWh", change: "+12.5%", up: true },
+  { name: "Carbon Credits", value: "1,890", unit: "tCO2e", change: "+8.2%", up: true },
+  { name: "Active Contracts", value: "47", unit: "", change: "+3", up: true },
+  { name: "Portfolio Value", value: "R 4.2M", unit: "", change: "+5.7%", up: true },
 ];
 
 const recentTrades = [
-  { id: 1, instrument: 'Solar PPA - Northern Cape', type: 'buy', volume: 500, price: 0.75, time: '2 min ago', status: 'completed' },
-  { id: 2, instrument: 'Wind PPA - Eastern Cape', type: 'sell', volume: 300, price: 0.62, time: '15 min ago', status: 'completed' },
-  { id: 3, instrument: 'Carbon Credits - Gold Standard', type: 'buy', volume: 100, price: 190, time: '1 hour ago', status: 'pending' },
-  { id: 4, instrument: 'REC Batch #234', type: 'buy', volume: 200, price: 125, time: '2 hours ago', status: 'completed' },
+  { id: 1, instrument: "Solar PPA - Northern Cape", type: "buy", volume: "500 MWh", price: "R 0.75", time: "2 min ago", status: "completed" },
+  { id: 2, instrument: "Wind PPA - Eastern Cape", type: "sell", volume: "300 MWh", price: "R 0.62", time: "15 min ago", status: "completed" },
+  { id: 3, instrument: "Carbon Credits - Gold Standard", type: "buy", volume: "100 tCO2e", price: "R 190", time: "1 hour ago", status: "pending" },
+  { id: 4, instrument: "REC Batch #234", type: "buy", volume: "200 MWh", price: "R 125", time: "2 hours ago", status: "completed" },
 ];
 
 const marketOverview = [
-  { name: 'Solar PPA', price: 0.75, change: 2.3, volume: '12.5K MWh' },
-  { name: 'Wind PPA', price: 0.62, change: -1.2, volume: '8.3K MWh' },
-  { name: 'Carbon Credits', price: 190, change: 5.8, volume: '45K tCO2e' },
-  { name: 'RECs', price: 125, change: 1.5, volume: '23K MWh' },
+  { name: "Solar PPA", price: "R 0.75/MWh", change: "+2.3%", up: true, color: "bg-amber-100 text-amber-600" },
+  { name: "Wind PPA", price: "R 0.62/MWh", change: "-1.2%", up: false, color: "bg-sky-100 text-sky-600" },
+  { name: "Carbon Credits", price: "R 190/tCO2e", change: "+5.8%", up: true, color: "bg-green-100 text-green-600" },
+  { name: "RECs", price: "R 125/MWh", change: "+1.5%", up: true, color: "bg-violet-100 text-violet-600" },
+];
+
+const energyMix = [
+  { name: "Solar", pct: 45, color: "bg-amber-400" },
+  { name: "Wind", pct: 30, color: "bg-sky-400" },
+  { name: "Grid", pct: 25, color: "bg-gray-400" },
 ];
 
 export default function DashboardPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-esum-navy dark:to-gray-900">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside className={`
-        fixed top-0 left-0 z-50 h-full w-64 glass border-r border-white/10
-        transform transition-transform duration-300 lg:translate-x-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="flex items-center justify-between h-20 px-6 border-b border-white/10">
-          <div className="flex items-center space-x-3">
-            <Zap className="w-8 h-8 text-esum-green" />
-            <span className="text-xl font-serif font-bold text-white">ESUM</span>
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <Sidebar />
+      <div className="ml-[220px]">
+        <header className="sticky top-0 z-30 bg-[#F5F5F7]/80 backdrop-blur-md px-8 py-5 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-sm text-gray-400 mt-0.5">Welcome back! Here&apos;s your trading overview.</p>
           </div>
-          <button 
-            className="lg:hidden text-gray-400 hover:text-white"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <nav className="p-4 space-y-2">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition group"
-            >
-              <item.icon className="w-5 h-5 mr-3 group-hover:text-esum-green transition" />
-              <span className="font-medium">{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-esum-green to-esum-blue flex items-center justify-center text-white font-semibold">
-              JD
-            </div>
-            <div>
-              <p className="text-white font-medium">John Doe</p>
-              <p className="text-gray-400 text-sm">Anglo American</p>
-            </div>
-          </div>
-          <button className="flex items-center w-full px-4 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-            <LogOut className="w-5 h-5 mr-3" />
-            Logout
-          </button>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <div className="lg:ml-64">
-        {/* Top header */}
-        <header className="sticky top-0 z-30 h-20 glass border-b border-white/10 px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-full">
-            <div className="flex items-center space-x-4">
-              <button 
-                className="lg:hidden text-gray-400 hover:text-white"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-              
-              <div className={`relative transition-all duration-300 ${searchOpen ? 'w-96' : 'w-64'}`}>
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search instruments, contracts..."
-                  className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                  onFocus={() => setSearchOpen(true)}
-                  onBlur={() => setSearchOpen(false)}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <button className="relative p-2 text-gray-400 hover:text-white transition">
-                <Bell className="w-6 h-6" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-esum-green rounded-full" />
-              </button>
-              <div className="hidden sm:block text-right">
-                <p className="text-white font-medium">John Doe</p>
-                <p className="text-gray-400 text-sm">Trader</p>
-              </div>
-            </div>
+          <div className="flex items-center gap-3">
+            <button className="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M12 12L16 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            </button>
+            <button className="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition relative">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M14 6A5 5 0 004 6c0 5.25 3 7 5 7s5-1.75 5-7z" stroke="currentColor" strokeWidth="1.5"/><path d="M7 13v.5a2 2 0 004 0V13" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            </button>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center text-white text-xs font-bold">JD</div>
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-serif font-bold text-white mb-2">Dashboard</h1>
-            <p className="text-gray-400">Welcome back! Here&apos;s your trading overview.</p>
-          </div>
-
-          {/* Stats grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="glass rounded-xl p-6 card-hover"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-gray-400 text-sm">{stat.name}</p>
-                  <span className={`flex items-center text-sm font-medium ${
-                    stat.trend === 'up' ? 'text-esum-green' : 'text-red-500'
-                  }`}>
-                    {stat.trend === 'up' ? <ArrowUpRight className="w-4 h-4 mr-1" /> : <ArrowDownRight className="w-4 h-4 mr-1" />}
-                    {stat.change}
-                  </span>
+        <main className="px-8 pb-8">
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            {stats.map((s) => (
+              <div key={s.name} className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-gray-400">{s.name}</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${s.up ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"}`}>{s.change}</span>
                 </div>
-                <p className="text-3xl font-bold text-white">{stat.value}</p>
-              </motion.div>
+                <div className="text-2xl font-bold text-gray-900">{s.value}<span className="text-sm font-normal text-gray-400 ml-1">{s.unit}</span></div>
+              </div>
             ))}
           </div>
 
-          {/* Main grid */}
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Market overview */}
-            <div className="lg:col-span-2 glass rounded-xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-white">Market Overview</h2>
-                <Link href="/markets" className="text-esum-green hover:text-esum-green-light text-sm font-medium">
-                  View All →
-                </Link>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="col-span-2 bg-white rounded-2xl p-6 border border-gray-100">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="font-semibold text-gray-900">Market Overview</h2>
+                <Link href="/markets" className="text-xs font-medium text-gray-400 hover:text-gray-600 transition">View All &rarr;</Link>
               </div>
-              
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {marketOverview.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        item.name.includes('Solar') ? 'bg-esum-solar/20' :
-                        item.name.includes('Wind') ? 'bg-esum-wind/20' :
-                        item.name.includes('Carbon') ? 'bg-esum-gold/20' : 'bg-esum-blue/20'
-                      }`}>
-                        {item.name.includes('Solar') ? <Sun className="w-5 h-5 text-esum-solar" /> :
-                         item.name.includes('Wind') ? <Wind className="w-5 h-5 text-esum-wind" /> :
-                         item.name.includes('Carbon') ? <Leaf className="w-5 h-5 text-esum-gold" /> : <Battery className="w-5 h-5 text-esum-blue" />}
-                      </div>
-                      <div>
-                        <p className="text-white font-medium">{item.name}</p>
-                        <p className="text-gray-400 text-sm">Vol: {item.volume}</p>
-                      </div>
+                  <div key={item.name} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${item.color}`}>{item.name.charAt(0)}</div>
+                      <span className="text-sm font-medium text-gray-700">{item.name}</span>
                     </div>
-                    <div className="text-right">
-                      <p className="text-white font-mono font-medium">
-                        {item.name.includes('Carbon') ? 'R ' : 'R '}{item.price}
-                        {item.name.includes('Carbon') ? '/tCO2e' : '/MWh'}
-                      </p>
-                      <p className={`text-sm font-medium ${
-                        item.change >= 0 ? 'text-esum-green' : 'text-red-500'
-                      }`}>
-                        {item.change >= 0 ? '+' : ''}{item.change}%
-                      </p>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-mono font-medium text-gray-900">{item.price}</span>
+                      <span className={`text-xs font-medium ${item.up ? "text-green-600" : "text-red-500"}`}>{item.change}</span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Energy mix */}
-            <div className="glass rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-white mb-6">Your Energy Mix</h2>
-              
+            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+              <h2 className="font-semibold text-gray-900 mb-5">Your Energy Mix</h2>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Sun className="w-5 h-5 text-esum-solar" />
-                    <span className="text-gray-300">Solar</span>
+                {energyMix.map((e) => (
+                  <div key={e.name}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm text-gray-500">{e.name}</span>
+                      <span className="text-sm font-medium text-gray-900">{e.pct}%</span>
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className={`h-full ${e.color} rounded-full`} style={{ width: `${e.pct}%` }} />
+                    </div>
                   </div>
-                  <span className="text-white font-medium">45%</span>
-                </div>
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full w-[45%] bg-gradient-to-r from-esum-solar to-esum-gold rounded-full" />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Wind className="w-5 h-5 text-esum-wind" />
-                    <span className="text-gray-300">Wind</span>
-                  </div>
-                  <span className="text-white font-medium">30%</span>
-                </div>
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full w-[30%] bg-gradient-to-r from-esum-wind to-esum-blue rounded-full" />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Factory className="w-5 h-5 text-gray-400" />
-                    <span className="text-gray-300">Grid</span>
-                  </div>
-                  <span className="text-white font-medium">25%</span>
-                </div>
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full w-[25%] bg-gradient-to-r from-gray-400 to-gray-600 rounded-full" />
-                </div>
+                ))}
               </div>
-
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400">Renewable Target</span>
-                  <span className="text-esum-green font-medium">75% / 80%</span>
+              <div className="mt-6 pt-5 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm text-gray-400">Renewable Target</span>
+                  <span className="text-sm font-medium text-green-600">75% / 80%</span>
                 </div>
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full w-[94%] bg-gradient-to-r from-esum-green to-esum-green-light rounded-full" />
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-lime-400 rounded-full" style={{ width: "94%" }} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Recent trades */}
-          <div className="mt-6 glass rounded-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Recent Trades</h2>
-              <Link href="/markets" className="text-esum-green hover:text-esum-green-light text-sm font-medium">
-                View All →
-              </Link>
+          <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-semibold text-gray-900">Recent Trades</h2>
+              <Link href="/markets" className="text-xs font-medium text-gray-400 hover:text-gray-600 transition">View All &rarr;</Link>
             </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium text-sm">Instrument</th>
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium text-sm">Type</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium text-sm">Volume</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium text-sm">Price</th>
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium text-sm">Time</th>
-                    <th className="text-center py-3 px-4 text-gray-400 font-medium text-sm">Status</th>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Instrument</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
+                  <th className="text-right py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Volume</th>
+                  <th className="text-right py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Time</th>
+                  <th className="text-center py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentTrades.map((t) => (
+                  <tr key={t.id} className="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td className="py-3 px-3 text-sm font-medium text-gray-700">{t.instrument}</td>
+                    <td className="py-3 px-3">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${t.type === "buy" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"}`}>{t.type.toUpperCase()}</span>
+                    </td>
+                    <td className="py-3 px-3 text-right text-sm font-mono text-gray-700">{t.volume}</td>
+                    <td className="py-3 px-3 text-right text-sm font-mono text-gray-700">{t.price}</td>
+                    <td className="py-3 px-3 text-sm text-gray-400">{t.time}</td>
+                    <td className="py-3 px-3 text-center">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${t.status === "completed" ? "bg-green-50 text-green-600" : "bg-amber-50 text-amber-600"}`}>{t.status}</span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {recentTrades.map((trade) => (
-                    <tr key={trade.id} className="border-b border-white/5 hover:bg-white/5 transition">
-                      <td className="py-4 px-4">
-                        <span className="text-white font-medium">{trade.instrument}</span>
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          trade.type === 'buy' 
-                            ? 'bg-esum-green/20 text-esum-green' 
-                            : 'bg-red-500/20 text-red-500'
-                        }`}>
-                          {trade.type.toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-right text-white font-mono">
-                        {trade.volume} MWh
-                      </td>
-                      <td className="py-4 px-4 text-right text-white font-mono">
-                        R {trade.price}
-                      </td>
-                      <td className="py-4 px-4 text-gray-400 text-sm">
-                        {trade.time}
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          trade.status === 'completed'
-                            ? 'bg-esum-green/20 text-esum-green'
-                            : 'bg-yellow-500/20 text-yellow-500'
-                        }`}>
-                          {trade.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </main>
       </div>

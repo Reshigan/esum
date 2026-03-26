@@ -1,195 +1,91 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { 
-  Zap, LayoutDashboard, TrendingUp, Leaf, Bell, Settings, LogOut, Menu, X,
-  Clock, AlertCircle, CheckCircle
-} from 'lucide-react';
+import { Sidebar } from "@/components/Sidebar";
 
 const auctions = [
-  { id: 1, instrument: 'Solar PPA - 50MW Northern Cape', type: 'sealed_first_price', volume: 5000, reservePrice: 0.70, currentBid: 0.73, bids: 12, opensAt: '2024-03-28T09:00:00', closesAt: '2024-03-28T17:00:00', status: 'open' },
-  { id: 2, instrument: 'Wind PPA - 100MW Eastern Cape', type: 'sealed_second_price', volume: 10000, reservePrice: 0.55, currentBid: 0.58, bids: 8, opensAt: '2024-03-29T09:00:00', closesAt: '2024-03-29T17:00:00', status: 'scheduled' },
-  { id: 3, instrument: 'Carbon Credits - 25K tCO2e', type: 'english', volume: 25000, reservePrice: 180, currentBid: 192, bids: 23, opensAt: '2024-03-27T10:00:00', closesAt: '2024-03-27T16:00:00', status: 'open' },
+  { id: "AUC-001", name: "Solar PPA Bundle - 500MW", type: "Sealed Bid", startPrice: "R 0.70/MWh", endTime: "2h 45m", bids: 12, status: "active" },
+  { id: "AUC-002", name: "Wind Credits - Gold Standard", type: "Dutch", startPrice: "R 195/tCO2e", endTime: "5h 20m", bids: 8, status: "active" },
+  { id: "AUC-003", name: "REC Bundle Q2 2026", type: "English", startPrice: "R 120/MWh", endTime: "1d 3h", bids: 15, status: "active" },
+  { id: "AUC-004", name: "Baseload PPA - Mpumalanga", type: "Sealed Bid", startPrice: "R 0.85/MWh", endTime: "Ended", bids: 22, status: "completed" },
+  { id: "AUC-005", name: "Carbon Offset Portfolio", type: "English", startPrice: "R 2.1M", endTime: "Ended", bids: 18, status: "completed" },
 ];
 
+const typeColors: Record<string, string> = {
+  "Sealed Bid": "bg-blue-50 text-blue-600",
+  "Dutch": "bg-amber-50 text-amber-600",
+  "English": "bg-violet-50 text-violet-600",
+};
+
 export default function AuctionsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'bg-esum-green/20 text-esum-green';
-      case 'scheduled': return 'bg-yellow-500/20 text-yellow-500';
-      case 'closed': return 'bg-gray-500/20 text-gray-500';
-      default: return 'bg-gray-500/20 text-gray-500';
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-esum-navy dark:to-gray-900">
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-50 h-full w-64 glass border-r border-white/10 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform`}>
-        <div className="flex items-center justify-between h-20 px-6 border-b border-white/10">
-          <div className="flex items-center space-x-3">
-            <Zap className="w-8 h-8 text-esum-green" />
-            <span className="text-xl font-serif font-bold text-white">ESUM</span>
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <Sidebar />
+      <div className="ml-[220px]">
+        <header className="sticky top-0 z-30 bg-[#F5F5F7]/80 backdrop-blur-md px-8 py-5 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Auctions</h1>
+            <p className="text-sm text-gray-400 mt-0.5">Browse and participate in energy auctions</p>
           </div>
-        </div>
-        <nav className="p-4 space-y-2">
-          {[
-            { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            { name: 'Markets', href: '/markets', icon: TrendingUp },
-            { name: 'Carbon', href: '/carbon', icon: Leaf },
-            { name: 'Auctions', href: '/auctions', icon: Zap },
-            { name: 'Portfolio', href: '/portfolios', icon: Zap },
-            { name: 'Settings', href: '/settings', icon: Settings },
-          ].map((item) => (
-            <Link key={item.name} href={item.href} className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition">
-              <item.icon className="w-5 h-5 mr-3" />
-              <span className="font-medium">{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <div className="lg:ml-64">
-        <header className="sticky top-0 z-30 h-20 glass border-b border-white/10 px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button className="lg:hidden text-gray-400" onClick={() => setSidebarOpen(true)}>
-              <Menu className="w-6 h-6" />
-            </button>
-            <h1 className="text-2xl font-serif font-bold text-white">Auctions</h1>
-          </div>
-          <button className="btn-primary flex items-center">
-            <Zap className="w-5 h-5 mr-2" />
+          <button className="bg-[#1A1D23] text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-800 transition inline-flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             Create Auction
           </button>
         </header>
 
-        <main className="p-6">
-          {/* Auction info cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="glass rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <Clock className="w-8 h-8 text-esum-green" />
-                <span className="text-2xl font-bold text-white">3</span>
-              </div>
-              <p className="text-gray-400">Active Auctions</p>
+        <main className="px-8 pb-8">
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="bg-gradient-to-br from-lime-50 to-green-50 rounded-2xl p-5 border border-lime-100">
+              <span className="text-xs font-medium text-gray-400">Active Auctions</span>
+              <div className="text-2xl font-bold text-gray-900 mt-2">3</div>
             </div>
-            <div className="glass rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <AlertCircle className="w-8 h-8 text-yellow-500" />
-                <span className="text-2xl font-bold text-white">5</span>
-              </div>
-              <p className="text-gray-400">Scheduled This Week</p>
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <span className="text-xs font-medium text-gray-400">Your Active Bids</span>
+              <div className="text-2xl font-bold text-gray-900 mt-2">7</div>
             </div>
-            <div className="glass rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <CheckCircle className="w-8 h-8 text-esum-blue" />
-                <span className="text-2xl font-bold text-white">12</span>
-              </div>
-              <p className="text-gray-400">Completed This Month</p>
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <span className="text-xs font-medium text-gray-400">Won This Month</span>
+              <div className="text-2xl font-bold text-green-600 mt-2">2</div>
             </div>
           </div>
 
-          {/* Auctions list */}
-          <div className="space-y-6">
-            {auctions.map((auction, index) => (
-              <motion.div
-                key={auction.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="glass rounded-xl p-6"
-              >
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4 mb-3">
-                      <h3 className="text-xl font-semibold text-white">{auction.instrument}</h3>
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(auction.status)}`}>
-                        {auction.status.toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <p className="text-gray-400 text-sm">Auction Type</p>
-                        <p className="text-white font-medium capitalize">{auction.type.replace('_', ' ')}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 text-sm">Volume</p>
-                        <p className="text-white font-medium">{auction.volume.toLocaleString()} MWh</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 text-sm">Reserve Price</p>
-                        <p className="text-white font-medium">R {auction.reservePrice}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 text-sm">Current Bid</p>
-                        <p className="text-esum-green font-medium">R {auction.currentBid}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end space-y-4">
-                    <div className="text-right">
-                      <p className="text-gray-400 text-sm">Bids Received</p>
-                      <p className="text-2xl font-bold text-white">{auction.bids}</p>
-                    </div>
-                    
-                    {auction.status === 'open' && (
-                      <div className="flex space-x-3">
-                        <button className="btn-primary px-6 py-2">
-                          Place Bid
-                        </button>
-                        <button className="btn-secondary px-6 py-2">
-                          Details
-                        </button>
-                      </div>
-                    )}
-                    
-                    {auction.status === 'scheduled' && (
-                      <div className="text-right">
-                        <p className="text-gray-400 text-sm">Opens In</p>
-                        <p className="text-white font-medium">2 days</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Progress bar for open auctions */}
-                {auction.status === 'open' && (
-                  <div className="mt-6 pt-6 border-t border-white/10">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-gray-400">Time Remaining</span>
-                      <span className="text-esum-green font-medium">6 hours</span>
-                    </div>
-                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full w-[75%] bg-gradient-to-r from-esum-green to-esum-green-light rounded-full" />
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Auction types info */}
-          <div className="mt-8 glass rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Auction Types</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { name: 'Sealed First Price', desc: 'Highest bidder wins at their bid price' },
-                { name: 'Sealed Second Price', desc: 'Highest bidder wins at second-highest price' },
-                { name: 'Dutch', desc: 'Price starts high and decreases until bid' },
-                { name: 'English', desc: 'Open ascending price auction' }
-              ].map((type) => (
-                <div key={type.name} className="p-4 bg-white/5 rounded-lg">
-                  <h3 className="text-white font-medium mb-2">{type.name}</h3>
-                  <p className="text-gray-400 text-sm">{type.desc}</p>
-                </div>
-              ))}
-            </div>
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/50">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Auction</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Starting Price</th>
+                  <th className="text-center py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Time Left</th>
+                  <th className="text-center py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Bids</th>
+                  <th className="text-center py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                  <th className="text-center py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {auctions.map((a) => (
+                  <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
+                    <td className="py-3.5 px-4">
+                      <div className="text-sm font-medium text-gray-700">{a.name}</div>
+                      <div className="text-xs text-gray-400">{a.id}</div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${typeColors[a.type] || "bg-gray-100 text-gray-600"}`}>{a.type}</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-right text-sm font-mono text-gray-700">{a.startPrice}</td>
+                    <td className="py-3.5 px-4 text-center text-sm text-gray-500">{a.endTime}</td>
+                    <td className="py-3.5 px-4 text-center text-sm font-medium text-gray-700">{a.bids}</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${a.status === "active" ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-500"}`}>{a.status}</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <button className={`text-xs font-medium px-3 py-1.5 rounded-lg transition ${a.status === "active" ? "bg-[#1A1D23] text-white hover:bg-gray-800" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
+                        {a.status === "active" ? "Place Bid" : "View"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </main>
       </div>

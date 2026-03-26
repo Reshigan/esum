@@ -1,218 +1,100 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { 
-  Zap, LayoutDashboard, TrendingUp, Leaf, Bell, Settings, LogOut, Menu, X,
-  PieChart, TrendingUp as TrendUp, Download, Plus
-} from 'lucide-react';
+import { Sidebar } from "@/components/Sidebar";
+
+const holdings = [
+  { name: "Solar PPAs", value: "R 1.8M", allocation: 43, change: "+8.2%", up: true, color: "bg-amber-400" },
+  { name: "Wind PPAs", value: "R 1.1M", allocation: 26, change: "+3.5%", up: true, color: "bg-sky-400" },
+  { name: "Carbon Credits", value: "R 850K", allocation: 20, change: "+12.1%", up: true, color: "bg-green-400" },
+  { name: "RECs", value: "R 450K", allocation: 11, change: "-1.8%", up: false, color: "bg-violet-400" },
+];
 
 const contracts = [
-  { id: 'CTR-001', instrument: 'Solar PPA - Northern Cape', type: 'physical_ppa', volume: 5000, delivered: 2500, startDate: '2024-01-01', endDate: '2029-12-31', status: 'active', value: 3750000 },
-  { id: 'CTR-002', instrument: 'Wind PPA - Eastern Cape', type: 'physical_ppa', volume: 8000, delivered: 4200, startDate: '2024-02-01', endDate: '2034-01-31', status: 'active', value: 4960000 },
-  { id: 'CTR-003', instrument: 'Carbon Credits - Gold Standard', type: 'carbon_credit', volume: 50000, delivered: 50000, startDate: '2024-01-15', endDate: '2024-01-15', status: 'completed', value: 9750000 },
+  { name: "Solar PPA - Northern Cape", counterparty: "Eskom SOC", startDate: "Jan 2025", endDate: "Dec 2030", volume: "500 MWh/m", value: "R 4.5M", status: "active" },
+  { name: "Wind PPA - Eastern Cape", counterparty: "City of Cape Town", startDate: "Mar 2025", endDate: "Feb 2030", volume: "300 MWh/m", value: "R 2.2M", status: "active" },
+  { name: "Carbon Offset Agreement", counterparty: "Sasol Ltd", startDate: "Jun 2025", endDate: "Jun 2026", volume: "10K tCO2e", value: "R 1.9M", status: "pending" },
 ];
 
 export default function PortfoliosPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-esum-navy dark:to-gray-900">
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-50 h-full w-64 glass border-r border-white/10 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform`}>
-        <div className="flex items-center justify-between h-20 px-6 border-b border-white/10">
-          <div className="flex items-center space-x-3">
-            <Zap className="w-8 h-8 text-esum-green" />
-            <span className="text-xl font-serif font-bold text-white">ESUM</span>
-          </div>
-        </div>
-        <nav className="p-4 space-y-2">
-          {[
-            { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            { name: 'Markets', href: '/markets', icon: TrendingUp },
-            { name: 'Carbon', href: '/carbon', icon: Leaf },
-            { name: 'Auctions', href: '/auctions', icon: Zap },
-            { name: 'Portfolio', href: '/portfolios', icon: Zap },
-            { name: 'Settings', href: '/settings', icon: Settings },
-          ].map((item) => (
-            <Link key={item.name} href={item.href} className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition">
-              <item.icon className="w-5 h-5 mr-3" />
-              <span className="font-medium">{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <div className="lg:ml-64">
-        <header className="sticky top-0 z-30 h-20 glass border-b border-white/10 px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button className="lg:hidden text-gray-400" onClick={() => setSidebarOpen(true)}>
-              <Menu className="w-6 h-6" />
-            </button>
-            <h1 className="text-2xl font-serif font-bold text-white">Portfolio</h1>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button className="flex items-center px-4 py-2 bg-white/5 rounded-lg text-gray-300 hover:text-white transition">
-              <Download className="w-5 h-5 mr-2" />
-              Export
-            </button>
-            <button className="btn-primary flex items-center">
-              <Plus className="w-5 h-5 mr-2" />
-              New Contract
-            </button>
-          </div>
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <Sidebar />
+      <div className="ml-[220px]">
+        <header className="sticky top-0 z-30 bg-[#F5F5F7]/80 backdrop-blur-md px-8 py-5">
+          <h1 className="text-2xl font-bold text-gray-900">Portfolio</h1>
+          <p className="text-sm text-gray-400 mt-0.5">Your energy asset portfolio overview</p>
         </header>
 
-        <main className="p-6">
-          {/* Portfolio summary */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <PieChart className="w-8 h-8 text-esum-green" />
-                <span className="text-esum-green text-sm font-medium">+12.5%</span>
-              </div>
-              <p className="text-gray-400 text-sm mb-2">Total Portfolio Value</p>
-              <p className="text-3xl font-bold text-white">R 18.5M</p>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <TrendUp className="w-8 h-8 text-esum-blue" />
-                <span className="text-esum-green text-sm font-medium">+8.2%</span>
-              </div>
-              <p className="text-gray-400 text-sm mb-2">Energy Under Contract</p>
-              <p className="text-3xl font-bold text-white">18,000 MWh</p>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <Leaf className="w-8 h-8 text-esum-gold" />
-                <span className="text-esum-green text-sm font-medium">+15.3%</span>
-              </div>
-              <p className="text-gray-400 text-sm mb-2">Carbon Credits</p>
-              <p className="text-3xl font-bold text-white">125K tCO2e</p>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <Zap className="w-8 h-8 text-esum-solar" />
-                <span className="text-esum-green text-sm font-medium">75%</span>
-              </div>
-              <p className="text-gray-400 text-sm mb-2">Renewable Mix</p>
-              <p className="text-3xl font-bold text-white">Target: 80%</p>
-            </motion.div>
-          </div>
-
-          {/* Active contracts */}
-          <div className="glass rounded-xl p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Active Contracts</h2>
-              <Link href="/markets" className="text-esum-green hover:text-esum-green-light text-sm font-medium">
-                View All →
-              </Link>
+        <main className="px-8 pb-8">
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="bg-gradient-to-br from-lime-50 to-green-50 rounded-2xl p-5 border border-lime-100">
+              <span className="text-xs font-medium text-gray-400">Total Portfolio Value</span>
+              <div className="text-2xl font-bold text-gray-900 mt-2">R 4.2M</div>
+              <div className="text-xs text-green-600 font-medium mt-1">+5.7% this month</div>
             </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium text-sm">Contract ID</th>
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium text-sm">Instrument</th>
-                    <th className="text-center py-3 px-4 text-gray-400 font-medium text-sm">Type</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium text-sm">Volume</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium text-sm">Delivered</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium text-sm">Value</th>
-                    <th className="text-center py-3 px-4 text-gray-400 font-medium text-sm">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {contracts.map((contract) => (
-                    <tr key={contract.id} className="border-b border-white/5 hover:bg-white/5 transition">
-                      <td className="py-4 px-4">
-                        <span className="text-white font-mono text-sm">{contract.id}</span>
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className="text-white font-medium">{contract.instrument}</span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-gray-300 text-sm capitalize">{contract.type.replace('_', ' ')}</span>
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <span className="text-white font-mono">{contract.volume.toLocaleString()} MWh</span>
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          <div className="w-24 h-2 bg-white/5 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-esum-green rounded-full" 
-                              style={{ width: `${(contract.delivered / contract.volume) * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-white font-mono text-sm">{contract.delivered.toLocaleString()}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <span className="text-white font-mono">R {(contract.value / 1000000).toFixed(2)}M</span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                          contract.status === 'active' 
-                            ? 'bg-esum-green/20 text-esum-green'
-                            : 'bg-gray-500/20 text-gray-500'
-                        }`}>
-                          {contract.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <span className="text-xs font-medium text-gray-400">Active Contracts</span>
+              <div className="text-2xl font-bold text-gray-900 mt-2">47</div>
+            </div>
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <span className="text-xs font-medium text-gray-400">Monthly Revenue</span>
+              <div className="text-2xl font-bold text-gray-900 mt-2">R 385K</div>
             </div>
           </div>
 
-          {/* Energy mix visualization */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="glass rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-6">Energy Mix</h3>
-              <div className="space-y-4">
-                {[
-                  { name: 'Solar', percentage: 45, color: 'from-esum-solar to-esum-gold' },
-                  { name: 'Wind', percentage: 30, color: 'from-esum-wind to-esum-blue' },
-                  { name: 'Grid', percentage: 25, color: 'from-gray-400 to-gray-600' }
-                ].map((item) => (
-                  <div key={item.name}>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-gray-300">{item.name}</span>
-                      <span className="text-white font-medium">{item.percentage}%</span>
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 mb-6">
+            <h2 className="font-semibold text-gray-900 mb-5">Asset Allocation</h2>
+            <div className="space-y-4">
+              {holdings.map((h) => (
+                <div key={h.name} className="flex items-center gap-4">
+                  <div className={`w-3 h-3 rounded-full ${h.color}`} />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700">{h.name}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-gray-900">{h.value}</span>
+                        <span className={`text-xs font-medium ${h.up ? "text-green-600" : "text-red-500"}`}>{h.change}</span>
+                      </div>
                     </div>
-                    <div className="h-3 bg-white/5 rounded-full overflow-hidden">
-                      <div className={`h-full bg-gradient-to-r ${item.color} rounded-full`} style={{ width: `${item.percentage}%` }} />
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className={`h-full ${h.color} rounded-full`} style={{ width: `${h.allocation}%` }} />
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
+          </div>
 
-            <div className="glass rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-6">Performance Metrics</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                  <span className="text-gray-300">Avg. Cost per MWh</span>
-                  <span className="text-white font-mono">R 0.72</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                  <span className="text-gray-300">Carbon Intensity</span>
-                  <span className="text-white font-mono">0.26 kg/kWh</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                  <span className="text-gray-300">Grid Emission Factor</span>
-                  <span className="text-white font-mono">1.04 kg/kWh</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-esum-green/10 rounded-lg">
-                  <span className="text-gray-300">Reduction vs Grid</span>
-                  <span className="text-esum-green font-mono">-75%</span>
-                </div>
-              </div>
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-900">Active Contracts</h2>
             </div>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/50">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Contract</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Counterparty</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Period</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Volume</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Value</th>
+                  <th className="text-center py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contracts.map((c) => (
+                  <tr key={c.name} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
+                    <td className="py-3.5 px-4 text-sm font-medium text-gray-700">{c.name}</td>
+                    <td className="py-3.5 px-4 text-sm text-gray-500">{c.counterparty}</td>
+                    <td className="py-3.5 px-4 text-sm text-gray-500">{c.startDate} - {c.endDate}</td>
+                    <td className="py-3.5 px-4 text-right text-sm font-mono text-gray-700">{c.volume}</td>
+                    <td className="py-3.5 px-4 text-right text-sm font-mono font-medium text-gray-900">{c.value}</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${c.status === "active" ? "bg-green-50 text-green-600" : "bg-amber-50 text-amber-600"}`}>{c.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </main>
       </div>

@@ -1,248 +1,115 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Zap, Mail, Lock, Eye, EyeOff, ArrowLeft, Building2, Phone, User } from 'lucide-react';
+import Link from "next/link";
+import { useState } from "react";
+
+const LogoSvg = () => (
+  <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+    <rect width="32" height="32" rx="8" fill="#1A1D23"/>
+    <path d="M8 16.5L13 11V14.5H19V11L24 16.5L19 22V18.5H13V22L8 16.5Z" fill="url(#rlg)"/>
+    <defs><linearGradient id="rlg" x1="8" y1="11" x2="24" y2="22" gradientUnits="userSpaceOnUse"><stop stopColor="#C8E64E"/><stop offset="1" stopColor="#A3D139"/></linearGradient></defs>
+  </svg>
+);
 
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState(1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-esum-navy via-gray-900 to-esum-navy flex items-center justify-center p-4">
-      <div className="absolute inset-0 grid-pattern opacity-20" />
-      
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl relative z-10"
-      >
-        <Link href="/" className="absolute -top-16 left-0 flex items-center text-white hover:text-esum-green transition">
-          <ArrowLeft className="w-5 h-5 mr-2" />
+    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center px-4">
+      <div className="w-full max-w-[440px]">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition mb-8">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           Back to Home
         </Link>
 
-        <div className="glass rounded-2xl p-8">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <Zap className="w-12 h-12 text-esum-green" />
+        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+          <div className="flex justify-center mb-6"><LogoSvg /></div>
+          <h1 className="text-xl font-bold text-gray-900 text-center mb-1">Create Account</h1>
+          <p className="text-sm text-gray-400 text-center mb-6">Join the ESUM energy trading platform</p>
+
+          <div className="flex items-center gap-2 mb-8">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className={`flex-1 h-1 rounded-full ${s <= step ? "bg-lime-400" : "bg-gray-100"}`} />
+            ))}
+          </div>
+
+          {step === 1 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">First Name</label>
+                  <input type="text" placeholder="John" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Last Name</label>
+                  <input type="text" placeholder="Doe" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Work Email</label>
+                <input type="email" placeholder="you@company.com" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Password</label>
+                <input type="password" placeholder="Min 8 characters" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300" />
+              </div>
+              <button onClick={() => setStep(2)} className="w-full bg-[#1A1D23] text-white font-medium py-2.5 rounded-xl hover:bg-gray-800 transition text-sm">Continue</button>
             </div>
-            <h1 className="text-3xl font-serif font-bold text-white mb-2">
-              Create Your Account
-            </h1>
-            <p className="text-gray-400">
-              Join the future of energy trading
-            </p>
-          </div>
+          )}
 
-          {/* Progress steps */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center space-x-4">
-              {[1, 2, 3].map((s) => (
-                <div key={s} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                    step >= s ? 'bg-esum-green text-white' : 'bg-white/10 text-gray-400'
-                  }`}>
-                    {s}
-                  </div>
-                  {s < 3 && (
-                    <div className={`w-12 h-1 mx-2 rounded ${
-                      step > s ? 'bg-esum-green' : 'bg-white/10'
-                    }`} />
-                  )}
-                </div>
-              ))}
+          {step === 2 && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Organisation Name</label>
+                <input type="text" placeholder="Acme Energy Ltd" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Registration Number</label>
+                <input type="text" placeholder="2024/123456/07" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Participant Type</label>
+                <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition text-gray-400">
+                  <option>Select type</option>
+                  <option>Generator</option>
+                  <option>Consumer (C&amp;I)</option>
+                  <option>Trader</option>
+                  <option>Municipal Utility</option>
+                </select>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep(1)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Back</button>
+                <button onClick={() => setStep(3)} className="flex-1 bg-[#1A1D23] text-white font-medium py-2.5 rounded-xl hover:bg-gray-800 transition text-sm">Continue</button>
+              </div>
             </div>
-          </div>
+          )}
 
-          <form className="space-y-6">
-            {step === 1 && (
-              <>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      First Name
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="text"
-                        required
-                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                        placeholder="John"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Last Name
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="text"
-                        required
-                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                        placeholder="Doe"
-                      />
-                    </div>
-                  </div>
+          {step === 3 && (
+            <div className="space-y-4">
+              <div className="text-center py-4">
+                <div className="w-14 h-14 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-4">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#7CB518" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="email"
-                      required
-                      className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                      placeholder="you@company.com"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="w-full btn-primary py-3"
-                >
-                  Next Step
-                </button>
-              </>
-            )}
+                <h3 className="font-semibold text-gray-900 mb-1">Almost there!</h3>
+                <p className="text-sm text-gray-400">Review and accept the terms to create your account.</p>
+              </div>
+              <label className="flex items-start gap-3 text-xs text-gray-500 cursor-pointer">
+                <input type="checkbox" className="w-3.5 h-3.5 rounded border-gray-300 mt-0.5" />
+                I agree to the Terms of Service and Privacy Policy, and confirm POPIA compliance.
+              </label>
+              <div className="flex gap-3">
+                <button onClick={() => setStep(2)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Back</button>
+                <button className="flex-1 bg-[#1A1D23] text-white font-medium py-2.5 rounded-xl hover:bg-gray-800 transition text-sm">Create Account</button>
+              </div>
+            </div>
+          )}
 
-            {step === 2 && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Organisation Name
-                  </label>
-                  <div className="relative">
-                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      required
-                      className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                      placeholder="Company Name"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Organisation Type
-                  </label>
-                  <select className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green">
-                    <option value="">Select type</option>
-                    <option value="buyer">Energy Buyer (C&I Consumer)</option>
-                    <option value="seller">Energy Seller (IPP)</option>
-                    <option value="trader">Energy Trader</option>
-                    <option value="carbon_fund">Carbon Fund</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="tel"
-                      required
-                      className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                      placeholder="+27 11 123 4567"
-                    />
-                  </div>
-                </div>
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    className="flex-1 btn-secondary py-3"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStep(3)}
-                    className="flex-1 btn-primary py-3"
-                  >
-                    Next Step
-                  </button>
-                </div>
-              </>
-            )}
-
-            {step === 3 && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      minLength={8}
-                      className="w-full pl-10 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                      placeholder="••••••••"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                  <p className="text-gray-400 text-sm mt-2">
-                    Must be at least 8 characters with uppercase, lowercase, and number
-                  </p>
-                </div>
-                <div className="flex items-start">
-                  <input type="checkbox" required className="w-4 h-4 mt-1 rounded border-white/10 bg-white/5 text-esum-green focus:ring-esum-green" />
-                  <span className="ml-2 text-sm text-gray-400">
-                    I agree to the{' '}
-                    <Link href="/terms" className="text-esum-green hover:underline">Terms of Service</Link>
-                    {' '}and{' '}
-                    <Link href="/privacy" className="text-esum-green hover:underline">Privacy Policy</Link>
-                  </span>
-                </div>
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={() => setStep(2)}
-                    className="flex-1 btn-secondary py-3"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 btn-primary py-3"
-                  >
-                    Create Account
-                  </button>
-                </div>
-              </>
-            )}
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
-              Already have an account?{' '}
-              <Link href="/login" className="text-esum-green hover:text-esum-green-light transition font-medium">
-                Sign in
-              </Link>
-            </p>
-          </div>
+          <p className="text-sm text-gray-400 text-center mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="text-lime-600 hover:text-lime-700 font-medium">Sign in</Link>
+          </p>
         </div>
-
-        <div className="mt-8 text-center text-gray-500 text-sm">
-          <p>✓ Free 30-day trial • ✓ No credit card required • ✓ POPIA Compliant</p>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
