@@ -103,10 +103,10 @@ export default function CarbonPage() {
               <h3 className="font-semibold text-gray-900 mb-4">Carbon Tax Savings</h3>
               <div className="space-y-3">
                 <div className="flex justify-between"><span className="text-sm text-gray-400">Carbon Tax Rate</span><span className="text-sm font-medium text-gray-900">R 190/tCO2e</span></div>
-                <div className="flex justify-between"><span className="text-sm text-gray-400">Potential Offset Savings</span><span className="text-sm font-bold text-green-600">R 8,550,000</span></div>
+                <div className="flex justify-between"><span className="text-sm text-gray-400">Potential Offset Savings</span><span className="text-sm font-bold text-green-600">R 2,375,000</span></div>
               </div>
               <div className="mt-4 p-3 rounded-xl bg-lime-50 border border-lime-100">
-                <p className="text-xs text-gray-600">By retiring 45,000 tCO2e, you&apos;ve offset R 8,550,000 in carbon tax liability.</p>
+                <p className="text-xs text-gray-600">By retiring 12,500 tCO2e, you&apos;ve offset R 2,375,000 in carbon tax liability.</p>
               </div>
             </div>
           </div>
