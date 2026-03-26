@@ -39,4 +39,4 @@ jobs:
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler pages deploy apps/web/out --project-name=esum-platform --commit-dirty=true
+        run: pnpm dlx wrangler pages deploy apps/web/out --project-name=esum-platform --commit-dirty=true
