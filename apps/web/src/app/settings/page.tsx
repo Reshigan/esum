@@ -1,240 +1,116 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { 
-  Zap, LayoutDashboard, TrendingUp, Leaf, Bell, Settings, LogOut, Menu, X,
-  User, Building2, Shield, CreditCard, Globe, Moon as MoonIcon, Sun as SunIcon, Bell as BellIcon
-} from 'lucide-react';
+import { useState } from "react";
+import { Sidebar } from "@/components/Sidebar";
+
+const tabs = ["Profile", "Organisation", "Security", "Billing", "Notifications", "Preferences"];
 
 export default function SettingsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('profile');
-
-  const tabs = [
-    { id: 'profile', name: 'Profile', icon: User },
-    { id: 'organisation', name: 'Organisation', icon: Building2 },
-    { id: 'security', name: 'Security', icon: Shield },
-    { id: 'billing', name: 'Billing', icon: CreditCard },
-    { id: 'notifications', name: 'Notifications', icon: BellIcon },
-    { id: 'preferences', name: 'Preferences', icon: Globe },
-  ];
+  const [activeTab, setActiveTab] = useState("Profile");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-esum-navy dark:to-gray-900">
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-50 h-full w-64 glass border-r border-white/10 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform`}>
-        <div className="flex items-center justify-between h-20 px-6 border-b border-white/10">
-          <div className="flex items-center space-x-3">
-            <Zap className="w-8 h-8 text-esum-green" />
-            <span className="text-xl font-serif font-bold text-white">ESUM</span>
-          </div>
-        </div>
-        <nav className="p-4 space-y-2">
-          {[
-            { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            { name: 'Markets', href: '/markets', icon: TrendingUp },
-            { name: 'Carbon', href: '/carbon', icon: Leaf },
-            { name: 'Auctions', href: '/auctions', icon: Zap },
-            { name: 'Portfolio', href: '/portfolios', icon: Zap },
-            { name: 'Settings', href: '/settings', icon: Settings },
-          ].map((item) => (
-            <Link key={item.name} href={item.href} className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition">
-              <item.icon className="w-5 h-5 mr-3" />
-              <span className="font-medium">{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <div className="lg:ml-64">
-        <header className="sticky top-0 z-30 h-20 glass border-b border-white/10 px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button className="lg:hidden text-gray-400" onClick={() => setSidebarOpen(true)}>
-              <Menu className="w-6 h-6" />
-            </button>
-            <h1 className="text-2xl font-serif font-bold text-white">Settings</h1>
-          </div>
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <Sidebar />
+      <div className="ml-[220px]">
+        <header className="sticky top-0 z-30 bg-[#F5F5F7]/80 backdrop-blur-md px-8 py-5">
+          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+          <p className="text-sm text-gray-400 mt-0.5">Manage your account preferences</p>
         </header>
 
-        <main className="p-6">
-          <div className="max-w-4xl">
-            {/* Tabs */}
-            <div className="flex flex-wrap gap-2 mb-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center px-4 py-2 rounded-lg font-medium transition ${
-                    activeTab === tab.id
-                      ? 'bg-esum-green text-white'
-                      : 'bg-white/5 text-gray-300 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  <tab.icon className="w-5 h-5 mr-2" />
-                  {tab.name}
-                </button>
-              ))}
-            </div>
-
-            {/* Tab content */}
-            <div className="glass rounded-xl p-6">
-              {activeTab === 'profile' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <h2 className="text-xl font-semibold text-white mb-6">Profile Settings</h2>
-                  <div className="space-y-6">
-                    <div className="flex items-center space-x-4 mb-6">
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-esum-green to-esum-blue flex items-center justify-center text-2xl font-bold text-white">
-                        JD
-                      </div>
-                      <button className="btn-secondary text-sm">Change Photo</button>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">First Name</label>
-                        <input type="text" defaultValue="John" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Last Name</label>
-                        <input type="text" defaultValue="Doe" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                        <input type="email" defaultValue="john.doe@angloamerican.co.za" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Phone</label>
-                        <input type="tel" defaultValue="+27 11 123 4567" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green" />
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-4 pt-6 border-t border-white/10">
-                      <button className="btn-secondary">Cancel</button>
-                      <button className="btn-primary">Save Changes</button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'organisation' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <h2 className="text-xl font-semibold text-white mb-6">Organisation Settings</h2>
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Organisation Name</label>
-                      <input type="text" defaultValue="Anglo American Mining" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Organisation Type</label>
-                      <select className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green">
-                        <option>Buyer</option>
-                        <option>Seller</option>
-                        <option>Trader</option>
-                      </select>
-                    </div>
-                    <div className="p-4 bg-esum-green/10 rounded-lg border border-esum-green/20">
-                      <p className="text-esum-green text-sm">
-                        <strong>KYC Status:</strong> Approved ✓
-                      </p>
-                      <p className="text-gray-400 text-sm mt-1">
-                        Your organisation is verified and can trade on the platform.
-                      </p>
-                    </div>
-                    <div className="flex justify-end space-x-4 pt-6 border-t border-white/10">
-                      <button className="btn-secondary">Cancel</button>
-                      <button className="btn-primary">Save Changes</button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'security' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <h2 className="text-xl font-semibold text-white mb-6">Security Settings</h2>
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Current Password</label>
-                      <input type="password" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
-                      <input type="password" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Confirm New Password</label>
-                      <input type="password" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green" />
-                    </div>
-                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                      <div>
-                        <p className="text-white font-medium">Two-Factor Authentication</p>
-                        <p className="text-gray-400 text-sm">Add an extra layer of security</p>
-                      </div>
-                      <button className="btn-secondary text-sm">Enable</button>
-                    </div>
-                    <div className="flex justify-end space-x-4 pt-6 border-t border-white/10">
-                      <button className="btn-secondary">Cancel</button>
-                      <button className="btn-primary">Update Password</button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'preferences' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <h2 className="text-xl font-semibold text-white mb-6">Preferences</h2>
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <MoonIcon className="w-5 h-5 text-gray-400" />
-                        <div>
-                          <p className="text-white font-medium">Dark Mode</p>
-                          <p className="text-gray-400 text-sm">Use dark theme across the platform</p>
-                        </div>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-esum-green rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-esum-green"></div>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <BellIcon className="w-5 h-5 text-gray-400" />
-                        <div>
-                          <p className="text-white font-medium">Email Notifications</p>
-                          <p className="text-gray-400 text-sm">Receive trade and auction notifications</p>
-                        </div>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-esum-green rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-esum-green"></div>
-                      </label>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Default Currency</label>
-                      <select defaultValue="ZAR" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-esum-green">
-                        <option value="ZAR">ZAR - South African Rand</option>
-                        <option value="USD">USD - US Dollar</option>
-                        <option value="EUR">EUR - Euro</option>
-                      </select>
-                    </div>
-                    <div className="flex justify-end space-x-4 pt-6 border-t border-white/10">
-                      <button className="btn-secondary">Cancel</button>
-                      <button className="btn-primary">Save Preferences</button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {(activeTab === 'billing' || activeTab === 'notifications') && (
-                <div className="text-center py-12">
-                  <Settings className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Coming Soon</h3>
-                  <p className="text-gray-400">This section is under development.</p>
-                </div>
-              )}
-            </div>
+        <main className="px-8 pb-8">
+          <div className="flex gap-1 mb-6 bg-white rounded-xl p-1 border border-gray-100 w-fit">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  activeTab === tab ? "bg-lime-400 text-gray-900" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
+
+          {activeTab === "Profile" && (
+            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center text-white text-xl font-bold">JD</div>
+                <button className="text-sm font-medium text-lime-600 border border-lime-200 px-4 py-2 rounded-xl hover:bg-lime-50 transition">Change Photo</button>
+              </div>
+              <div className="grid grid-cols-2 gap-4 max-w-xl">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">First Name</label>
+                  <input type="text" defaultValue="John" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Last Name</label>
+                  <input type="text" defaultValue="Doe" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Email</label>
+                  <input type="email" defaultValue="john@angloamerican.com" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Phone</label>
+                  <input type="tel" defaultValue="+27 82 123 4567" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400" />
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Cancel</button>
+                <button className="px-5 py-2.5 rounded-xl bg-[#1A1D23] text-white text-sm font-medium hover:bg-gray-800 transition">Save Changes</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "Preferences" && (
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 max-w-xl">
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Dark Mode</p>
+                    <p className="text-xs text-gray-400">Use dark theme across the platform</p>
+                  </div>
+                  <div className="w-10 h-6 bg-gray-200 rounded-full relative cursor-pointer">
+                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 left-1 shadow-sm" />
+                  </div>
+                </div>
+                <div className="border-t border-gray-100" />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Trade Notifications</p>
+                    <p className="text-xs text-gray-400">Receive trade and auction notifications</p>
+                  </div>
+                  <div className="w-10 h-6 bg-lime-400 rounded-full relative cursor-pointer">
+                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1 shadow-sm" />
+                  </div>
+                </div>
+                <div className="border-t border-gray-100" />
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Default Currency</p>
+                  <select className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 w-48">
+                    <option>ZAR (R)</option>
+                    <option>USD ($)</option>
+                    <option>EUR</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Cancel</button>
+                <button className="px-5 py-2.5 rounded-xl bg-[#1A1D23] text-white text-sm font-medium hover:bg-gray-800 transition">Save Preferences</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab !== "Profile" && activeTab !== "Preferences" && (
+            <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"/><circle cx="12" cy="12" r="9" stroke="#9CA3AF" strokeWidth="2"/></svg>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">{activeTab}</h3>
+              <p className="text-sm text-gray-400">This section is coming soon.</p>
+            </div>
+          )}
         </main>
       </div>
     </div>

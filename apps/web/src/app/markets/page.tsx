@@ -1,178 +1,76 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { 
-  Zap, 
-  LayoutDashboard, 
-  TrendingUp, 
-  Leaf, 
-  Bell, 
-  Settings, 
-  LogOut,
-  Menu,
-  X,
-  Plus,
-  Filter,
-  Sun,
-  Wind,
-  Battery,
-  Droplets,
-  ArrowUpRight,
-  ArrowDownRight
-} from 'lucide-react';
+import { Sidebar } from "@/components/Sidebar";
 
 const instruments = [
-  { id: 1, name: 'Solar PPA - Northern Cape', type: 'physical_ppa', source: 'solar', price: 0.75, volume: 5000, seller: 'SolarCo Energy', status: 'active' },
-  { id: 2, name: 'Wind PPA - Eastern Cape', type: 'physical_ppa', source: 'wind', price: 0.62, volume: 8000, seller: 'WindForce Power', status: 'active' },
-  { id: 3, name: 'Carbon Credits - Gold Standard', type: 'carbon_credit', source: 'carbon', price: 190, volume: 10000, seller: 'SA Carbon Fund', status: 'active' },
-  { id: 4, name: 'REC Batch #234', type: 'rec', source: 'solar', price: 125, volume: 2000, seller: 'GreenGen Renewables', status: 'active' },
-  { id: 5, name: 'Bundled Green Contract', type: 'bundled_green', source: 'mixed', price: 0.85, volume: 3000, seller: 'AfriSun Solar', status: 'active' },
-  { id: 6, name: 'Virtual PPA - 5 Year', type: 'virtual_ppa', source: 'wind', price: 0.68, volume: 6000, seller: 'Cape Wind Farms', status: 'active' },
+  { name: "Solar PPA - Northern Cape", type: "Solar", bid: "R 0.74", ask: "R 0.76", last: "R 0.75", volume: "12.5K MWh", change: "+2.3%", up: true },
+  { name: "Wind PPA - Eastern Cape", type: "Wind", bid: "R 0.61", ask: "R 0.63", last: "R 0.62", volume: "8.3K MWh", change: "-1.2%", up: false },
+  { name: "Carbon Credits - Gold Standard", type: "Carbon", bid: "R 188", ask: "R 192", last: "R 190", volume: "45K tCO2e", change: "+5.8%", up: true },
+  { name: "Carbon Credits - Verra VCS", type: "Carbon", bid: "R 175", ask: "R 178", last: "R 176", volume: "32K tCO2e", change: "+3.2%", up: true },
+  { name: "RECs - IREC Standard", type: "REC", bid: "R 123", ask: "R 127", last: "R 125", volume: "23K MWh", change: "+1.5%", up: true },
+  { name: "Baseload PPA - Gauteng", type: "Baseload", bid: "R 0.89", ask: "R 0.92", last: "R 0.90", volume: "5.2K MWh", change: "-0.8%", up: false },
 ];
 
-const sourceIcons: Record<string, any> = {
-  solar: Sun,
-  wind: Wind,
-  carbon: Leaf,
-  battery: Battery,
-  hydro: Droplets,
-  mixed: Zap
+const typeColors: Record<string, string> = {
+  Solar: "bg-amber-100 text-amber-600",
+  Wind: "bg-sky-100 text-sky-600",
+  Carbon: "bg-green-100 text-green-600",
+  REC: "bg-violet-100 text-violet-600",
+  Baseload: "bg-gray-100 text-gray-600",
 };
 
 export default function MarketsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState<string>('all');
-
-  const filteredInstruments = selectedType === 'all' 
-    ? instruments 
-    : instruments.filter(i => i.type === selectedType);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-esum-navy dark:to-gray-900">
-      {/* Sidebar - same as dashboard */}
-      <aside className={`fixed top-0 left-0 z-50 h-full w-64 glass border-r border-white/10 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform`}>
-        <div className="flex items-center justify-between h-20 px-6 border-b border-white/10">
-          <div className="flex items-center space-x-3">
-            <Zap className="w-8 h-8 text-esum-green" />
-            <span className="text-xl font-serif font-bold text-white">ESUM</span>
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <Sidebar />
+      <div className="ml-[220px]">
+        <header className="sticky top-0 z-30 bg-[#F5F5F7]/80 backdrop-blur-md px-8 py-5 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Energy Markets</h1>
+            <p className="text-sm text-gray-400 mt-0.5">Live market data and order book</p>
           </div>
-        </div>
-        <nav className="p-4 space-y-2">
-          {[
-            { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            { name: 'Markets', href: '/markets', icon: TrendingUp },
-            { name: 'Carbon', href: '/carbon', icon: Leaf },
-            { name: 'Auctions', href: '/auctions', icon: Zap },
-            { name: 'Portfolio', href: '/portfolios', icon: Zap },
-            { name: 'Settings', href: '/settings', icon: Settings },
-          ].map((item) => (
-            <Link key={item.name} href={item.href} className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition">
-              <item.icon className="w-5 h-5 mr-3" />
-              <span className="font-medium">{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <div className="lg:ml-64">
-        <header className="sticky top-0 z-30 h-20 glass border-b border-white/10 px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button className="lg:hidden text-gray-400" onClick={() => setSidebarOpen(true)}>
-              <Menu className="w-6 h-6" />
-            </button>
-            <h1 className="text-2xl font-serif font-bold text-white">Markets</h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="btn-primary flex items-center">
-              <Plus className="w-5 h-5 mr-2" />
-              List Instrument
-            </button>
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.2"/><path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+            <input type="text" placeholder="Search instruments..." className="pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 w-64 bg-white placeholder:text-gray-300" />
           </div>
         </header>
 
-        <main className="p-6">
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-4 mb-6">
-            <div className="flex items-center space-x-2 bg-white/5 rounded-lg p-1">
-              {['all', 'physical_ppa', 'virtual_ppa', 'rec', 'carbon_credit', 'bundled_green'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setSelectedType(type)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                    selectedType === type
-                      ? 'bg-esum-green text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  {type.replace('_', ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                </button>
-              ))}
-            </div>
-            <button className="flex items-center px-4 py-2 bg-white/5 rounded-lg text-gray-300 hover:text-white transition">
-              <Filter className="w-5 h-5 mr-2" />
-              More Filters
-            </button>
-          </div>
-
-          {/* Instruments grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredInstruments.map((instrument, index) => {
-              const SourceIcon = sourceIcons[instrument.source] || Zap;
-              
-              return (
-                <motion.div
-                  key={instrument.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="glass rounded-xl p-6 card-hover"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 rounded-lg bg-esum-green/20 flex items-center justify-center">
-                        <SourceIcon className="w-6 h-6 text-esum-green" />
-                      </div>
-                      <div>
-                        <h3 className="text-white font-semibold">{instrument.name}</h3>
-                        <p className="text-gray-400 text-sm">{instrument.seller}</p>
-                      </div>
-                    </div>
-                    <span className="px-2 py-1 bg-esum-green/20 text-esum-green text-xs font-medium rounded-full">
-                      {instrument.status}
-                    </span>
-                  </div>
-
-                  <div className="space-y-3 mb-6">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-sm">Price</span>
-                      <span className="text-white font-mono font-medium">
-                        R {instrument.price} {instrument.type === 'carbon_credit' ? '/tCO2e' : '/MWh'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-sm">Available Volume</span>
-                      <span className="text-white font-medium">{instrument.volume.toLocaleString()} MWh</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-sm">Type</span>
-                      <span className="text-white text-sm capitalize">{instrument.type.replace('_', ' ')}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-3">
-                    <button className="flex-1 btn-primary py-2 text-sm">
-                      Buy
-                    </button>
-                    <button className="flex-1 btn-secondary py-2 text-sm">
-                      Details
-                    </button>
-                  </div>
-                </motion.div>
-              );
-            })}
+        <main className="px-8 pb-8">
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/50">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Instrument</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Bid</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Ask</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Last</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Volume</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Change</th>
+                  <th className="text-center py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {instruments.map((inst) => (
+                  <tr key={inst.name} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
+                    <td className="py-3.5 px-4 text-sm font-medium text-gray-700">{inst.name}</td>
+                    <td className="py-3.5 px-4">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${typeColors[inst.type] || "bg-gray-100 text-gray-600"}`}>{inst.type}</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-right text-sm font-mono text-gray-600">{inst.bid}</td>
+                    <td className="py-3.5 px-4 text-right text-sm font-mono text-gray-600">{inst.ask}</td>
+                    <td className="py-3.5 px-4 text-right text-sm font-mono font-medium text-gray-900">{inst.last}</td>
+                    <td className="py-3.5 px-4 text-right text-sm text-gray-500">{inst.volume}</td>
+                    <td className="py-3.5 px-4 text-right">
+                      <span className={`text-xs font-medium ${inst.up ? "text-green-600" : "text-red-500"}`}>{inst.change}</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <button className="text-xs font-medium px-3 py-1.5 rounded-lg bg-[#1A1D23] text-white hover:bg-gray-800 transition">Trade</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </main>
       </div>

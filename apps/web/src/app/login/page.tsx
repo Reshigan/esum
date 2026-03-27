@@ -1,108 +1,62 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Zap, Mail, Lock, Eye, EyeOff, ArrowLeft, Building2, User, Phone } from 'lucide-react';
+import Link from "next/link";
+import { useState } from "react";
+
+const LogoSvg = () => (
+  <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+    <rect width="32" height="32" rx="8" fill="#1A1D23"/>
+    <path d="M8 16.5L13 11V14.5H19V11L24 16.5L19 22V18.5H13V22L8 16.5Z" fill="url(#llg)"/>
+    <defs><linearGradient id="llg" x1="8" y1="11" x2="24" y2="22" gradientUnits="userSpaceOnUse"><stop stopColor="#C8E64E"/><stop offset="1" stopColor="#A3D139"/></linearGradient></defs>
+  </svg>
+);
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-esum-navy via-gray-900 to-esum-navy flex items-center justify-center p-4">
-      <div className="absolute inset-0 grid-pattern opacity-20" />
-      
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md relative z-10"
-      >
-        <Link href="/" className="absolute -top-16 left-0 flex items-center text-white hover:text-esum-green transition">
-          <ArrowLeft className="w-5 h-5 mr-2" />
+    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center px-4">
+      <div className="w-full max-w-[400px]">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition mb-8">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           Back to Home
         </Link>
 
-        <div className="glass rounded-2xl p-8">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <Zap className="w-12 h-12 text-esum-green" />
-            </div>
-            <h1 className="text-3xl font-serif font-bold text-white mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-gray-400">
-              Sign in to your ESUM account
-            </p>
-          </div>
+        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+          <div className="flex justify-center mb-6"><LogoSvg /></div>
+          <h1 className="text-xl font-bold text-gray-900 text-center mb-1">Welcome Back</h1>
+          <p className="text-sm text-gray-400 text-center mb-8">Sign in to your ESUM account</p>
 
-          <form className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="email"
-                  required
-                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                  placeholder="you@company.com"
-                />
-              </div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Email</label>
+              <input type="email" placeholder="you@company.com" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300" />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  className="w-full pl-10 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-esum-green focus:ring-1 focus:ring-esum-green transition"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                <input type={showPassword ? "text" : "password"} placeholder="Enter password" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300 pr-10" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 4C3 4 1 8 1 8s2 4 7 4 7-4 7-4-2-4-7-4z" stroke="currentColor" strokeWidth="1.2"/><circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.2"/></svg>
                 </button>
               </div>
             </div>
-
             <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-white/5 text-esum-green focus:ring-esum-green" />
-                <span className="ml-2 text-sm text-gray-400">Remember me</span>
+              <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                <input type="checkbox" className="w-3.5 h-3.5 rounded border-gray-300" />
+                Remember me
               </label>
-              <Link href="/forgot-password" className="text-sm text-esum-green hover:text-esum-green-light transition">
-                Forgot password?
-              </Link>
+              <Link href="#" className="text-xs text-lime-600 hover:text-lime-700 font-medium">Forgot password?</Link>
             </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
-              Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-esum-green hover:text-esum-green-light transition font-medium">
-                Sign up
-              </Link>
-            </p>
+            <button className="w-full bg-[#1A1D23] text-white font-medium py-2.5 rounded-xl hover:bg-gray-800 transition text-sm">Sign In</button>
           </div>
+
+          <p className="text-sm text-gray-400 text-center mt-6">
+            Don&apos;t have an account?{" "}
+            <Link href="/register" className="text-lime-600 hover:text-lime-700 font-medium">Sign up</Link>
+          </p>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
