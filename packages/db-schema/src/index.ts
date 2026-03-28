@@ -349,8 +349,8 @@ export const contracts = sqliteTable(
       enum: ['spot', 'term', 'vppa', 'physical_ppa', 'wheeling']
     }).notNull(),
     status: text('status', {
-      enum: ['draft', 'active', 'completed', 'terminated', 'disputed']
-    }).notNull(),
+      enum: ['draft', 'pending_signature', 'partially_signed', 'active', 'completed', 'terminated', 'disputed', 'expired']
+    }).notNull().default('draft'),
     startDate: text('start_date').notNull(),
     endDate: text('end_date').notNull(),
     totalContractedMwh: real('total_contracted_mwh').notNull(),
@@ -359,10 +359,18 @@ export const contracts = sqliteTable(
     priceTerms: text('price_terms', { mode: 'json' }).notNull(),
     carbonTerms: text('carbon_terms', { mode: 'json' }),
     wheelingTerms: text('wheeling_terms', { mode: 'json' }),
+    legalTerms: text('legal_terms', { mode: 'json' }),
+    templateId: text('template_id').references(() => contractTemplates.id),
+    version: integer('version').notNull().default(1),
+    parentContractId: text('parent_contract_id').references(() => contracts.id),
     signedDocumentR2Key: text('signed_document_r2_key'),
+    unsignedDocumentR2Key: text('unsigned_document_r2_key'),
     signedAt: text('signed_at'),
+    activatedAt: text('activated_at'),
+    completedAt: text('completed_at'),
     terminatedAt: text('terminated_at'),
     terminationReason: text('termination_reason'),
+    metadata: text('metadata', { mode: 'json' }),
     createdAt: text('created_at')
       .notNull()
       .$defaultFn(() => new Date().toISOString()),
@@ -374,7 +382,165 @@ export const contracts = sqliteTable(
     idxTrade: index('idx_contracts_trade').on(table.tradeId),
     idxBuyerOrg: index('idx_contracts_buyer_org').on(table.buyerOrgId),
     idxSellerOrg: index('idx_contracts_seller_org').on(table.sellerOrgId),
-    idxStatus: index('idx_contracts_status').on(table.status)
+    idxStatus: index('idx_contracts_status').on(table.status),
+    idxType: index('idx_contracts_type').on(table.contractType),
+    idxTemplate: index('idx_contracts_template').on(table.templateId)
+  })
+);
+
+// ============================================================================
+// CONTRACT TEMPLATES
+// ============================================================================
+
+export const contractTemplates = sqliteTable(
+  'contract_templates',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    description: text('description'),
+    contractType: text('contract_type', {
+      enum: ['spot', 'term', 'vppa', 'physical_ppa', 'wheeling']
+    }).notNull(),
+    version: text('version').notNull(),
+    status: text('status', {
+      enum: ['draft', 'active', 'deprecated']
+    }).notNull().default('draft'),
+    templateDocumentR2Key: text('template_document_r2_key').notNull(),
+    defaultTerms: text('default_terms', { mode: 'json' }).notNull(),
+    requiredFields: text('required_fields', { mode: 'json' }).notNull(),
+    optionalFields: text('optional_fields', { mode: 'json' }),
+    approvalRequired: integer('approval_required', { mode: 'boolean' }).notNull().default(false),
+    approvedByUserId: text('approved_by_user_id').references(() => users.id),
+    approvedAt: text('approved_at'),
+    createdByUserId: text('created_by_user_id')
+      .notNull()
+      .references(() => users.id),
+    createdAt: text('created_at')
+      .notNull()
+      .$defaultFn(() => new Date().toISOString()),
+    updatedAt: text('updated_at')
+      .notNull()
+      .$defaultFn(() => new Date().toISOString())
+  },
+  (table) => ({
+    idxType: index('idx_templates_type').on(table.contractType),
+    idxStatus: index('idx_templates_status').on(table.status)
+  })
+);
+
+// ============================================================================
+// CONTRACT SIGNATURES
+// ============================================================================
+
+export const contractSignatures = sqliteTable(
+  'contract_signatures',
+  {
+    id: text('id').primaryKey(),
+    contractId: text('contract_id')
+      .notNull()
+      .references(() => contracts.id, { onDelete: 'cascade' }),
+    signerUserId: text('signer_user_id')
+      .notNull()
+      .references(() => users.id),
+    signerOrgId: text('signer_org_id')
+      .notNull()
+      .references(() => organisations.id),
+    signerRole: text('signer_role').notNull(), // e.g., 'CEO', 'CFO', 'Authorized Signatory'
+    signerEmail: text('signer_email').notNull(),
+    signerName: text('signer_name').notNull(),
+    signatureType: text('signature_type', {
+      enum: ['electronic', 'digital', 'wet_ink']
+    }).notNull().default('electronic'),
+    signatureData: text('signature_data', { mode: 'json' }), // Signature image, hash, etc.
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    geolocation: text('geolocation', { mode: 'json' }), // { lat, lng, country }
+    signedAt: text('signed_at').notNull(),
+    certificateR2Key: text('certificate_r2_key'), // Digital signature certificate
+    witnessUserId: text('witness_user_id').references(() => users.id),
+    witnessName: text('witness_name'),
+    witnessEmail: text('witness_email'),
+    witnessSignedAt: text('witness_signed_at'),
+    status: text('status', {
+      enum: ['pending', 'signed', 'declined', 'revoked']
+    }).notNull().default('pending'),
+    declinedReason: text('declined_reason'),
+    revokedReason: text('revoked_reason'),
+    metadata: text('metadata', { mode: 'json' }),
+    createdAt: text('created_at')
+      .notNull()
+      .$defaultFn(() => new Date().toISOString())
+  },
+  (table) => ({
+    idxContract: index('idx_signatures_contract').on(table.contractId),
+    idxSigner: index('idx_signatures_user').on(table.signerUserId),
+    idxStatus: index('idx_signatures_status').on(table.status),
+    uniqueContractSigner: uniqueIndex('idx_unique_contract_signer').on(table.contractId, table.signerUserId)
+  })
+);
+
+// ============================================================================
+// CONTRACT AMENDMENTS
+// ============================================================================
+
+export const contractAmendments = sqliteTable(
+  'contract_amendments',
+  {
+    id: text('id').primaryKey(),
+    contractId: text('contract_id')
+      .notNull()
+      .references(() => contracts.id, { onDelete: 'cascade' }),
+    amendmentNumber: integer('amendment_number').notNull(),
+    title: text('title').notNull(),
+    description: text('description').notNull(),
+    proposedChanges: text('proposed_changes', { mode: 'json' }).notNull(),
+    status: text('status', {
+      enum: ['draft', 'proposed', 'accepted', 'rejected', 'executed']
+    }).notNull().default('draft'),
+    proposedByUserId: text('proposed_by_user_id')
+      .notNull()
+      .references(() => users.id),
+    proposedAt: text('proposed_at').notNull(),
+    acceptedByBuyerUserId: text('accepted_by_buyer_user_id').references(() => users.id),
+    acceptedBySellerUserId: text('accepted_by_seller_user_id').references(() => users.id),
+    acceptedAt: text('accepted_at'),
+    executedAt: text('executed_at'),
+    amendmentDocumentR2Key: text('amendment_document_r2_key'),
+    createdAt: text('created_at')
+      .notNull()
+      .$defaultFn(() => new Date().toISOString())
+  },
+  (table) => ({
+    idxContract: index('idx_amendments_contract').on(table.contractId),
+    idxStatus: index('idx_amendments_status').on(table.status)
+  })
+);
+
+// ============================================================================
+// CONTRACT AUDIT LOG
+// ============================================================================
+
+export const contractAuditLog = sqliteTable(
+  'contract_audit_log',
+  {
+    id: text('id').primaryKey(),
+    contractId: text('contract_id')
+      .notNull()
+      .references(() => contracts.id, { onDelete: 'cascade' }),
+    action: text('action').notNull(),
+    performedByUserId: text('performed_by_user_id').references(() => users.id),
+    performedByOrgId: text('performed_by_org_id').references(() => organisations.id),
+    changes: text('changes', { mode: 'json' }),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    timestamp: text('timestamp')
+      .notNull()
+      .$defaultFn(() => new Date().toISOString())
+  },
+  (table) => ({
+    idxContract: index('idx_contract_audit_contract').on(table.contractId),
+    idxAction: index('idx_contract_audit_action').on(table.action),
+    idxTimestamp: index('idx_contract_audit_timestamp').on(table.timestamp)
   })
 );
 

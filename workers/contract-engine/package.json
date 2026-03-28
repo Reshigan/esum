@@ -1,0 +1,23 @@
+{
+  "name": "@esum/contract-engine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "tsc",
+    "deploy": "wrangler deploy --minify",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@esum/shared-types": "workspace:*",
+    "@esum/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.1",
+    "wrangler": "^3.28.0"
+  }
+}
