@@ -85,7 +85,7 @@ export default function CarbonPage() {
 
   const handleRetireCredits = async (creditId: string) => {
     try {
-      await apiClient.retireCarbonCredits({ credit_ids: [creditId], beneficiary: user?.organisation?.name });
+      await apiClient.retireCarbonCredits({ credit_ids: [creditId], beneficiary: organisation?.name });
       showSuccess("Credits retired successfully");
       // Refresh data
       const response = await apiClient.getCarbonCredits({ limit: 50 });
