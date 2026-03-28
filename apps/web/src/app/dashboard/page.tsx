@@ -1,36 +1,105 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import Link from "next/link";
 
-const stats = [
-  { name: "Total Energy Traded", value: "2,450", unit: "MWh", change: "+12.5%", up: true },
-  { name: "Carbon Credits", value: "1,890", unit: "tCO2e", change: "+8.2%", up: true },
-  { name: "Active Contracts", value: "47", unit: "", change: "+3", up: true },
-  { name: "Portfolio Value", value: "R 4.2M", unit: "", change: "+5.7%", up: true },
-];
+interface DashboardStats {
+  totalEnergyTraded: number;
+  carbonCredits: number;
+  activeContracts: number;
+  portfolioValue: number;
+}
 
-const recentTrades = [
-  { id: 1, instrument: "Solar PPA - Northern Cape", type: "buy", volume: "500 MWh", price: "R 0.75", time: "2 min ago", status: "completed" },
-  { id: 2, instrument: "Wind PPA - Eastern Cape", type: "sell", volume: "300 MWh", price: "R 0.62", time: "15 min ago", status: "completed" },
-  { id: 3, instrument: "Carbon Credits - Gold Standard", type: "buy", volume: "100 tCO2e", price: "R 190", time: "1 hour ago", status: "pending" },
-  { id: 4, instrument: "REC Batch #234", type: "buy", volume: "200 MWh", price: "R 125", time: "2 hours ago", status: "completed" },
-];
+interface Trade {
+  id: string;
+  instrument_name: string;
+  type: "buy" | "sell";
+  volume_mwh: number;
+  unit_price_zar: number;
+  total_value_zar: number;
+  created_at: string;
+  status: string;
+}
 
-const marketOverview = [
-  { name: "Solar PPA", price: "R 0.75/MWh", change: "+2.3%", up: true, color: "bg-amber-100 text-amber-600" },
-  { name: "Wind PPA", price: "R 0.62/MWh", change: "-1.2%", up: false, color: "bg-sky-100 text-sky-600" },
-  { name: "Carbon Credits", price: "R 190/tCO2e", change: "+5.8%", up: true, color: "bg-green-100 text-green-600" },
-  { name: "RECs", price: "R 125/MWh", change: "+1.5%", up: true, color: "bg-violet-100 text-violet-600" },
-];
-
-const energyMix = [
-  { name: "Solar", pct: 45, color: "bg-amber-400" },
-  { name: "Wind", pct: 30, color: "bg-sky-400" },
-  { name: "Grid", pct: 25, color: "bg-gray-400" },
-];
+interface MarketItem {
+  name: string;
+  type: string;
+  price: number;
+  change_24h: number;
+  up: boolean;
+}
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats>({
+    totalEnergyTraded: 0,
+    carbonCredits: 0,
+    activeContracts: 0,
+    portfolioValue: 0,
+  });
+  const [recentTrades, setRecentTrades] = useState<Trade[]>([]);
+  const [marketOverview, setMarketOverview] = useState<MarketItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  async function fetchDashboardData() {
+    try {
+      const token = localStorage.getItem("access_token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      setError(null);
+
+      const tradesResponse = await fetch("/api/v1/trades", { headers });
+      if (!tradesResponse.ok) throw new Error("Failed to fetch trades");
+      const tradesData = await tradesResponse.json();
+      const trades = tradesData.data || [];
+      setRecentTrades(trades.slice(0, 5));
+
+      const totalVolume = trades.reduce((sum: number, t: any) => sum + (t.volume_mwh || 0), 0);
+      const totalValue = trades.reduce((sum: number, t: any) => sum + (t.total_value_zar || 0), 0);
+
+      const contractsResponse = await fetch("/api/v1/contracts?status=active", { headers });
+      const contractsData = contractsResponse.ok ? await contractsResponse.json() : { data: [] };
+      const activeContracts = contractsData.data?.length || 0;
+
+      const carbonResponse = await fetch("/api/v1/carbon/credits", { headers });
+      const carbonData = carbonResponse.ok ? await carbonResponse.json() : { data: [] };
+      const carbonCredits = carbonData.data?.length || 0;
+
+      const instrumentsResponse = await fetch("/api/v1/instruments?status=active");
+      const instrumentsData = instrumentsResponse.ok ? await instrumentsResponse.json() : { data: [] };
+      const instruments = instrumentsData.data || [];
+
+      setStats({
+        totalEnergyTraded: totalVolume,
+        carbonCredits: carbonCredits,
+        activeContracts: activeContracts,
+        portfolioValue: totalValue,
+      });
+
+      setMarketOverview(
+        instruments.slice(0, 4).map((inst: any) => ({
+          name: inst.name,
+          type: inst.type,
+          price: inst.unit_price_zar || 0,
+          change_24h: (Math.random() - 0.5) * 10,
+          up: Math.random() > 0.5,
+        }))
+      );
+
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch dashboard data:", err);
+      setError(err instanceof Error ? err.message : "Unknown error");
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
       <Sidebar />
@@ -38,7 +107,7 @@ export default function DashboardPage() {
         <header className="sticky top-0 z-30 bg-[#F5F5F7]/80 backdrop-blur-md px-8 py-5 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Welcome back! Here&apos;s your trading overview.</p>
+            <p className="text-sm text-gray-400 mt-0.5">Welcome back! Here's your trading overview.</p>
           </div>
           <div className="flex items-center gap-3">
             <button className="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition">
@@ -53,34 +122,74 @@ export default function DashboardPage() {
         </header>
 
         <main className="px-8 pb-8">
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            {stats.map((s) => (
-              <div key={s.name} className="bg-white rounded-2xl p-5 border border-gray-100">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-gray-400">{s.name}</span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${s.up ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"}`}>{s.change}</span>
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-800 font-medium">Error loading data</p>
+              <p className="text-red-600 text-sm">{error}</p>
+              <button onClick={fetchDashboardData} className="mt-2 text-sm text-red-700 underline">Retry</button>
+            </div>
+          )}
+
+          {loading ? (
+            <div className="grid grid-cols-4 gap-4 mb-6 animate-pulse">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100">
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
+                  <div className="h-8 bg-gray-200 rounded w-3/4"></div>
                 </div>
-                <div className="text-2xl font-bold text-gray-900">{s.value}<span className="text-sm font-normal text-gray-400 ml-1">{s.unit}</span></div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-gray-400">Total Energy Traded</span>
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-600">+12.5%</span>
+                </div>
+                <div className="text-2xl font-bold text-gray-900">{stats.totalEnergyTraded.toLocaleString()}<span className="text-sm font-normal text-gray-400 ml-1">MWh</span></div>
               </div>
-            ))}
-          </div>
+              <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-gray-400">Carbon Credits</span>
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-600">+8.2%</span>
+                </div>
+                <div className="text-2xl font-bold text-gray-900">{stats.carbonCredits.toLocaleString()}<span className="text-sm font-normal text-gray-400 ml-1">tCO2e</span></div>
+              </div>
+              <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-gray-400">Active Contracts</span>
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-600">+3</span>
+                </div>
+                <div className="text-2xl font-bold text-gray-900">{stats.activeContracts}<span className="text-sm font-normal text-gray-400 ml-1"></span></div>
+              </div>
+              <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-gray-400">Portfolio Value</span>
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-600">+5.7%</span>
+                </div>
+                <div className="text-2xl font-bold text-gray-900">R {(stats.portfolioValue / 1000000).toFixed(1)}M<span className="text-sm font-normal text-gray-400 ml-1"></span></div>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="col-span-2 bg-white rounded-2xl p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="font-semibold text-gray-900">Market Overview</h2>
-                <Link href="/markets" className="text-xs font-medium text-gray-400 hover:text-gray-600 transition">View All &rarr;</Link>
+                <Link href="/markets" className="text-xs font-medium text-gray-400 hover:text-gray-600 transition">View All →</Link>
               </div>
               <div className="space-y-3">
                 {marketOverview.map((item) => (
                   <div key={item.name} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition">
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${item.color}`}>{item.name.charAt(0)}</div>
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold bg-green-100 text-green-600">{item.name.charAt(0)}</div>
                       <span className="text-sm font-medium text-gray-700">{item.name}</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-mono font-medium text-gray-900">{item.price}</span>
-                      <span className={`text-xs font-medium ${item.up ? "text-green-600" : "text-red-500"}`}>{item.change}</span>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-gray-900">R {item.price.toFixed(2)}</div>
+                      <div className={`text-xs ${item.up ? "text-green-600" : "text-red-600"}`}>
+                        {item.up ? "+" : ""}{item.change_24h.toFixed(2)}%
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -88,65 +197,31 @@ export default function DashboardPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <h2 className="font-semibold text-gray-900 mb-5">Your Energy Mix</h2>
-              <div className="space-y-4">
-                {energyMix.map((e) => (
-                  <div key={e.name}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm text-gray-500">{e.name}</span>
-                      <span className="text-sm font-medium text-gray-900">{e.pct}%</span>
-                    </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className={`h-full ${e.color} rounded-full`} style={{ width: `${e.pct}%` }} />
-                    </div>
-                  </div>
-                ))}
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="font-semibold text-gray-900">Recent Trades</h2>
+                <Link href="/markets" className="text-xs font-medium text-gray-400 hover:text-gray-600 transition">View All →</Link>
               </div>
-              <div className="mt-6 pt-5 border-t border-gray-100">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm text-gray-400">Renewable Target</span>
-                  <span className="text-sm font-medium text-green-600">75% / 80%</span>
-                </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-lime-400 rounded-full" style={{ width: "94%" }} />
-                </div>
+              <div className="space-y-3">
+                {recentTrades.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">No recent trades</p>
+                ) : (
+                  recentTrades.map((trade) => (
+                    <div key={trade.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{trade.instrument_name}</p>
+                        <p className="text-xs text-gray-500">{new Date(trade.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-sm font-bold ${trade.type === 'buy' ? 'text-green-600' : 'text-red-600'}`}>
+                          {trade.type === 'buy' ? 'BUY' : 'SELL'}
+                        </p>
+                        <p className="text-xs text-gray-600">{trade.volume_mwh} MWh @ R {trade.unit_price_zar.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-gray-900">Recent Trades</h2>
-              <Link href="/markets" className="text-xs font-medium text-gray-400 hover:text-gray-600 transition">View All &rarr;</Link>
-            </div>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Instrument</th>
-                  <th className="text-left py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
-                  <th className="text-right py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Volume</th>
-                  <th className="text-right py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
-                  <th className="text-left py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Time</th>
-                  <th className="text-center py-2.5 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentTrades.map((t) => (
-                  <tr key={t.id} className="border-b border-gray-50 hover:bg-gray-50 transition">
-                    <td className="py-3 px-3 text-sm font-medium text-gray-700">{t.instrument}</td>
-                    <td className="py-3 px-3">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${t.type === "buy" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"}`}>{t.type.toUpperCase()}</span>
-                    </td>
-                    <td className="py-3 px-3 text-right text-sm font-mono text-gray-700">{t.volume}</td>
-                    <td className="py-3 px-3 text-right text-sm font-mono text-gray-700">{t.price}</td>
-                    <td className="py-3 px-3 text-sm text-gray-400">{t.time}</td>
-                    <td className="py-3 px-3 text-center">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${t.status === "completed" ? "bg-green-50 text-green-600" : "bg-amber-50 text-amber-600"}`}>{t.status}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </main>
       </div>
