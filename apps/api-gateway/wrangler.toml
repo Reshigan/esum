@@ -1,0 +1,28 @@
+name = "esum-api-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "energy_trading_db"
+database_id = "aa6ba829-a8b9-4b36-932b-8509f7432e7b"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "8a5c2761cac849669675fa7a9721a763"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "898dfed622044c399facd725f8815f55"
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "energy-documents"
+
+[vars]
+ENVIRONMENT = "production"
+PLATFORM_NAME = "ESUM"
+
+[env.production]
+name = "esum-api-gateway"

@@ -1,0 +1,29 @@
+name = "esum-trading-engine"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "energy_trading_db"
+database_id = "aa6ba829-a8b9-4b36-932b-8509f7432e7b"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "898dfed622044c399facd725f8815f55"
+
+[[queues.producers]]
+binding = "TRADE_QUEUE"
+queue = "trade-execution"
+
+[[queues.producers]]
+binding = "NOTIFICATION_QUEUE"
+queue = "notification-dispatch"
+
+[durable_objects]
+bindings = [
+  { name = "ORDER_BOOK", class_name = "OrderBook" }
+]
+
+[vars]
+ENVIRONMENT = "production"

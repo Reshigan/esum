@@ -1,0 +1,22 @@
+name = "esum-carbon-engine"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "energy_trading_db"
+database_id = "aa6ba829-a8b9-4b36-932b-8509f7432e7b"
+
+[[queues.producers]]
+binding = "NOTIFICATION_QUEUE"
+queue = "notification-dispatch"
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "energy-documents"
+
+[vars]
+ENVIRONMENT = "production"
+GRID_EMISSION_FACTOR = "1.04"
+CARBON_TAX_RATE = "190"
