@@ -94,6 +94,8 @@ jobs:
           - notifications
           - grid-integration
           - admin
+          - contract-engine
+          - eskom-integration
       fail-fast: false
     steps:
       - name: Checkout

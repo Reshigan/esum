@@ -150,6 +150,14 @@ jobs:
         run: pnpm --filter admin exec wrangler deploy --dry-run --outdir dist
         continue-on-error: true
 
+      - name: Build Contract Engine Worker
+        run: pnpm --filter @esum/contract-engine exec wrangler deploy --dry-run --outdir dist
+        continue-on-error: true
+
+      - name: Build Eskom Integration Worker
+        run: pnpm --filter eskom-integration exec wrangler deploy --dry-run --outdir dist
+        continue-on-error: true
+
   db-schema-check:
     name: Database Schema Check
     runs-on: ubuntu-latest
