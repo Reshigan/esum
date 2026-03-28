@@ -137,7 +137,7 @@ export class OrderBook {
       if (order.orderType === 'ask' && level.price < order.limitPrice) break;
 
       // Match volume
-      const matchVolume = Math.min(order.remainingVolume, level.volume);
+      let matchVolume = Math.min(order.remainingVolume, level.volume);
 
       for (const oppositeOrderId of level.orders) {
         if (matchVolume <= 0) break;
