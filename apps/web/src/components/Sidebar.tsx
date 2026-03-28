@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Logo } from './Logo';
+import { useAuth } from './AuthProvider';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
@@ -15,6 +16,11 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+
+  const initials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'JD';
 
   return (
     <aside className="fixed top-0 left-0 z-50 h-full w-[220px] bg-white border-r border-gray-100 flex flex-col">
@@ -45,12 +51,23 @@ export function Sidebar() {
       <div className="p-4 border-t border-gray-100">
         <div className="flex items-center gap-3 px-2">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center text-white text-xs font-bold">
-            JD
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">John Doe</p>
-            <p className="text-xs text-gray-400 truncate">Anglo American</p>
+            <p className="text-sm font-medium text-gray-900 truncate">{user?.name || 'Guest'}</p>
+            <p className="text-xs text-gray-400 truncate">{user?.company || ''}</p>
           </div>
+          <button
+            onClick={logout}
+            title="Sign out"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 2H3C2.44772 2 2 2.44772 2 3V13C2 13.5523 2.44772 14 3 14H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M11 11L14 8L11 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M14 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
         </div>
       </div>
     </aside>

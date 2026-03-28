@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ClientLayout } from '@/components/ClientLayout';
 
 export const metadata: Metadata = {
   title: 'ESUM | Energy Trading Platform',
@@ -17,7 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-brand-gray text-gray-900 font-sans antialiased">{children}</body>
+      <body className="bg-brand-gray text-gray-900 font-sans antialiased">
+        <ClientLayout>{children}</ClientLayout>
+      </body>
     </html>
   );
 }
