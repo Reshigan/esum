@@ -32,7 +32,9 @@ export const organisations = sqliteTable(
         'municipality',
         'carbon_fund',
         'institutional_investor',
-        'system_operator'
+        'system_operator',
+        'ipp', // Independent Power Producer
+        'offtaker' // Energy Offtaker
       ]
     }).notNull(),
     status: text('status', {
@@ -1008,3 +1010,294 @@ export const featureFlags = sqliteTable('feature_flags', {
     .notNull()
     .$defaultFn(() => new Date().toISOString())
 });
+
+// ============================================================================
+// IPP PROJECTS - Independent Power Producer Project Management
+// ============================================================================
+
+export const ippProjects = sqliteTable('ipp_projects', {
+  id: text('id').primaryKey(),
+  ippOrgId: text('ipp_org_id')
+    .notNull()
+    .references(() => organisations.id, { onDelete: 'cascade' }),
+  projectName: text('project_name').notNull(),
+  projectType: text('project_type', {
+    enum: ['solar_pv', 'wind', 'hydro', 'biomass', 'battery_storage', 'hybrid']
+  }).notNull(),
+  province: text('province', {
+    enum: [
+      'eastern_cape',
+      'free_state',
+      'gauteng',
+      'kwazulu_natal',
+      'limpopo',
+      'mpumalanga',
+      'northern_cape',
+      'north_west',
+      'western_cape'
+    ]
+  }).notNull(),
+  location: text('location'), // GPS coordinates or address
+  capacityMw: real('capacity_mw').notNull(),
+  estimatedAnnualGenerationGwh: real('estimated_annual_generation_gwh'),
+  status: text('status', {
+    enum: [
+      'concept',
+      'feasibility',
+      'development',
+      'financial_close',
+      'construction',
+      'commissioning',
+      'operational',
+      'decommissioned'
+    ]
+  }).notNull().default('concept'),
+  financialCloseTarget: text('financial_close_target'),
+  financialCloseActual: text('financial_close_actual'),
+  commercialOperationDate: text('commercial_operation_date'),
+  totalInvestmentZar: real('total_investment_zar'),
+  equityRaisedZar: real('equity_raised_zar'),
+  debtRaisedZar: real('debt_raised_zar'),
+  offtakeAgreementId: text('offtake_agreement_id').references(() => offtakeAgreements.id),
+  gridConnectionStatus: text('grid_connection_status', {
+    enum: ['not_applied', 'application_submitted', 'approved', 'connection_agreement', 'connected']
+  }).notNull().default('not_applied'),
+  environmentalAuthStatus: text('environmental_auth_status', {
+    enum: ['not_required', 'application_submitted', 'approved', 'rejected']
+  }).notNull().default('not_required'),
+  permitsStatus: text('permits_status', {
+    enum: ['pending', 'partial', 'complete']
+  }).notNull().default('pending'),
+  constructionProgress: integer('construction_progress').default(0), // 0-100%
+  commissionedCapacityMw: real('commissioned_capacity_mw'),
+  metadata: text('metadata', { mode: 'json' }),
+  createdByUserId: text('created_by_user_id')
+    .notNull()
+    .references(() => users.id),
+  createdAt: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updatedAt: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString())
+},
+(table) => ({
+  idxIppOrg: index('idx_ipp_projects_ipp_org').on(table.ippOrgId),
+  idxStatus: index('idx_ipp_projects_status').on(table.status),
+  idxProvince: index('idx_ipp_projects_province').on(table.province),
+  idxType: index('idx_ipp_projects_type').on(table.projectType)
+}));
+
+// ============================================================================
+// OFFTAKE AGREEMENTS - Power Purchase Agreements between IPP and Offtaker
+// ============================================================================
+
+export const offtakeAgreements = sqliteTable('offtake_agreements', {
+  id: text('id').primaryKey(),
+  ippOrgId: text('ipp_org_id')
+    .notNull()
+    .references(() => organisations.id, { onDelete: 'cascade' }),
+  offtakerOrgId: text('offtaker_org_id')
+    .notNull()
+    .references(() => organisations.id, { onDelete: 'cascade' }),
+  projectId: text('project_id').references(() => ippProjects.id),
+  agreementType: text('agreement_type', {
+    enum: ['physical_ppa', 'virtual_ppa', 'wheeling_agreement', 'merchant', 'hybrid']
+  }).notNull(),
+  status: text('status', {
+    enum: [
+      'term_sheet',
+      'negotiation',
+      'signed',
+      'conditions_precedent',
+      'financial_close',
+      'active',
+      'terminated',
+      'expired'
+    ]
+  }).notNull().default('term_sheet'),
+  contractTenorYears: integer('contract_tenor_years').notNull(),
+  contractedCapacityMw: real('contracted_capacity_mw').notNull(),
+  annualContractedGwh: real('annual_contracted_gwh'),
+  tariffStructure: text('tariff_structure', {
+    enum: ['fixed', 'escalating', 'inflation_linked', 'market_indexed', 'hybrid']
+  }).notNull(),
+  baseTariffZarKwh: real('base_tariff_zar_kwh').notNull(),
+  escalationRatePercent: real('escalation_rate_percent'),
+  currency: text('currency').notNull().default('ZAR'),
+  deliveryStartDate: text('delivery_start_date'),
+  deliveryEndDate: text('delivery_end_date'),
+  deliveryPoint: text('delivery_point').notNull(), // Grid connection point
+  wheelingArrangement: text('wheeling_arrangement', {
+    enum: ['seller_responsible', 'buyer_responsible', 'platform_coordinated', 'none']
+  }),
+  performanceSecurity: text('performance_security'), // Bank guarantee details
+  terminationClauses: text('termination_clauses', { mode: 'json' }),
+  forceMajeure: text('force_majeure', { mode: 'json' }),
+  disputeResolution: text('dispute_resolution').notNull().default('arbitration'),
+  governingLaw: text('governing_law').notNull().default('South Africa'),
+  signedDate: text('signed_date'),
+  effectiveDate: text('effective_date'),
+  financialCloseDate: text('financial_close_date'),
+  contractDocumentR2Key: text('contract_document_r2_key'),
+  metadata: text('metadata', { mode: 'json' }),
+  createdByUserId: text('created_by_user_id')
+    .notNull()
+    .references(() => users.id),
+  createdAt: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updatedAt: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString())
+},
+(table) => ({
+  idxIpp: index('idx_offtake_ipp_org').on(table.ippOrgId),
+  idxOfftaker: index('idx_offtake_offtaker_org').on(table.offtakerOrgId),
+  idxProject: index('idx_offtake_project').on(table.projectId),
+  idxStatus: index('idx_offtake_status').on(table.status)
+}));
+
+// ============================================================================
+// FINANCIAL CLOSE MILESTONES - Track progress to financial close
+// ============================================================================
+
+export const financialCloseMilestones = sqliteTable('financial_close_milestones', {
+  id: text('id').primaryKey(),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => ippProjects.id, { onDelete: 'cascade' }),
+  milestoneType: text('milestone_type', {
+    enum: [
+      'land_acquisition',
+      'grid_connection_approval',
+      'environmental_authorization',
+      'water_use_license',
+      'municipal_approvals',
+      'offtake_agreement',
+      'engineering_procurement',
+      'equity_commitment',
+      'debt_commitment',
+      'insurance_arrangement',
+      'operations_maintenance',
+      'regulatory_compliance',
+      'other'
+    ]
+  }).notNull(),
+  description: text('description').notNull(),
+  status: text('status', {
+    enum: ['not_started', 'in_progress', 'completed', 'blocked', 'cancelled']
+  }).notNull().default('not_started'),
+  targetDate: text('target_date'),
+  actualDate: text('actual_date'),
+  completionPercent: integer('completion_percent').default(0),
+  blockedReason: text('blocked_reason'),
+  responsibleParty: text('responsible_party'),
+  dependencies: text('dependencies', { mode: 'json' }), // Array of milestone IDs
+  documents: text('documents', { mode: 'json' }), // Array of document references
+  comments: text('comments'),
+  createdByUserId: text('created_by_user_id')
+    .notNull()
+    .references(() => users.id),
+  createdAt: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updatedAt: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString())
+},
+(table) => ({
+  idxProject: index('idx_fc_milestones_project').on(table.projectId),
+  idxStatus: index('idx_fc_milestones_status').on(table.status),
+  idxType: index('idx_fc_milestones_type').on(table.milestoneType)
+}));
+
+// ============================================================================
+// PROJECT UPDATES - Progress updates and communications
+// ============================================================================
+
+export const projectUpdates = sqliteTable('project_updates', {
+  id: text('id').primaryKey(),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => ippProjects.id, { onDelete: 'cascade' }),
+  updateType: text('update_type', {
+    enum: [
+      'milestone_completed',
+      'financial_update',
+      'construction_progress',
+      'regulatory_update',
+      'offtake_update',
+      'risk_alert',
+      'general'
+    ]
+  }).notNull(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  visibility: text('visibility', {
+    enum: ['internal', 'investors', 'offtaker', 'public']
+  }).notNull().default('internal'),
+  attachments: text('attachments', { mode: 'json' }), // Array of document references
+  authorUserId: text('author_user_id')
+    .notNull()
+    .references(() => users.id),
+  publishedAt: text('published_at'),
+  createdAt: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updatedAt: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString())
+},
+(table) => ({
+  idxProject: index('idx_project_updates_project').on(table.projectId),
+  idxType: index('idx_project_updates_type').on(table.updateType),
+  idxVisibility: index('idx_project_updates_visibility').on(table.visibility)
+}));
+
+// ============================================================================
+// INVESTOR COMMITMENTS - Equity and debt commitments for projects
+// ============================================================================
+
+export const investorCommitments = sqliteTable('investor_commitments', {
+  id: text('id').primaryKey(),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => ippProjects.id, { onDelete: 'cascade' }),
+  investorOrgId: text('investor_org_id')
+    .notNull()
+    .references(() => organisations.id, { onDelete: 'cascade' }),
+  commitmentType: text('commitment_type', {
+    enum: ['equity', 'debt', 'grant', 'concessional_financing']
+  }).notNull(),
+  committedAmountZar: real('committed_amount_zar').notNull(),
+  disbursedAmountZar: real('disbursed_amount_zar').notNull().default(0),
+  currency: text('currency').notNull().default('ZAR'),
+  interestRatePercent: real('interest_rate_percent'), // For debt
+  tenorYears: integer('tenor_years'), // For debt
+  status: text('status', {
+    enum: ['committed', 'disbursing', 'fully_disbursed', 'cancelled']
+  }).notNull().default('committed'),
+  conditionsPrecedent: text('conditions_precedent', { mode: 'json' }),
+  disbursementSchedule: text('disbursement_schedule', { mode: 'json' }),
+  commitmentDate: text('commitment_date'),
+  firstDisbursementDate: text('first_disbursement_date'),
+  finalDisbursementDate: text('final_disbursement_date'),
+  agreementDocumentR2Key: text('agreement_document_r2_key'),
+  metadata: text('metadata', { mode: 'json' }),
+  createdByUserId: text('created_by_user_id')
+    .notNull()
+    .references(() => users.id),
+  createdAt: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updatedAt: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString())
+},
+(table) => ({
+  idxProject: index('idx_investor_commitments_project').on(table.projectId),
+  idxInvestor: index('idx_investor_commitments_investor').on(table.investorOrgId),
+  idxType: index('idx_investor_commitments_type').on(table.commitmentType),
+  idxStatus: index('idx_investor_commitments_status').on(table.status)
+}));
