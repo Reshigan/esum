@@ -28,7 +28,7 @@ const formatStandard = (standard: string) => {
 };
 
 export default function CarbonPage() {
-  const { user } = useAuth();
+  const { user, organisation } = useAuth();
   const { showSuccess, showError } = useToast();
   const [credits, setCredits] = useState<CarbonCredit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
