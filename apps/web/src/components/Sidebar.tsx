@@ -16,7 +16,7 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, organisation, logout } = useAuth();
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -55,7 +55,7 @@ export function Sidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{user?.name || 'Guest'}</p>
-            <p className="text-xs text-gray-400 truncate">{user?.company || ''}</p>
+            <p className="text-xs text-gray-400 truncate">{organisation?.name || ''}</p>
           </div>
           <button
             onClick={logout}
