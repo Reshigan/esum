@@ -9,23 +9,23 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "energy_trading_db"
-database_id = "YOUR_D1_DATABASE_ID"
+database_id = "aa6ba829-a8b9-4b36-932b-8509f7432e7b"
 
 # KV Namespaces
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "YOUR_KV_SESSIONS_ID"
-preview_id = "YOUR_KV_SESSIONS_PREVIEW_ID"
+id = "8a5c2761cac849669675fa7a9721a763"
+preview_id = "8a5c2761cac849669675fa7a9721a763"
 
 [[kv_namespaces]]
 binding = "CACHE"
-id = "YOUR_KV_CACHE_ID"
-preview_id = "YOUR_KV_CACHE_PREVIEW_ID"
+id = "898dfed622044c399facd725f8815f55"
+preview_id = "898dfed622044c399facd725f8815f55"
 
 [[kv_namespaces]]
 binding = "FEATURE_FLAGS"
-id = "YOUR_KV_FEATURE_FLAGS_ID"
-preview_id = "YOUR_KV_FEATURE_FLAGS_PREVIEW_ID"
+id = "8d102561e32b4b3f8e5664295624adda"
+preview_id = "8d102561e32b4b3f8e5664295624adda"
 
 # R2 Buckets
 [[r2_buckets]]

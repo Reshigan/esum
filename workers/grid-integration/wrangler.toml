@@ -1,0 +1,19 @@
+name = "esum-grid-integration"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "energy_trading_db"
+database_id = "aa6ba829-a8b9-4b36-932b-8509f7432e7b"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "898dfed622044c399facd725f8815f55"
+
+[triggers]
+crons = ["*/15 * * * *"]
+
+[vars]
+ENVIRONMENT = "production"

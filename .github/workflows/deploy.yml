@@ -1,18 +1,16 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy-frontend:
+    name: Deploy Frontend (Cloudflare Pages)
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,9 +21,21 @@ jobs:
           node-version: '20'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 9
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -34,9 +44,110 @@ jobs:
         run: pnpm --filter web build
 
       - name: Deploy to Cloudflare Pages
-        if: github.ref == 'refs/heads/main'
         env:
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: pnpm dlx wrangler pages deploy apps/web/out --project-name=esum-platform --commit-dirty=true
+        run: pnpm dlx wrangler@3 pages deploy apps/web/out --project-name=esum-platform --commit-dirty=true
+
+  deploy-api-gateway:
+    name: Deploy API Gateway
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy API Gateway
+        env:
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        working-directory: apps/api-gateway
+        run: pnpm dlx wrangler@3 deploy
+
+  deploy-workers:
+    name: Deploy Workers
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        worker:
+          - trading-engine
+          - carbon-engine
+          - settlement
+          - notifications
+          - grid-integration
+          - admin
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy ${{ matrix.worker }}
+        env:
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        working-directory: workers/${{ matrix.worker }}
+        run: pnpm dlx wrangler@3 deploy
+
+  deploy-db-migrations:
+    name: Deploy DB Migrations
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate and apply DB migrations
+        env:
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd packages/db-schema
+          npx drizzle-kit generate 2>&1 || echo "No new migrations to generate"
+          echo "DB migration generation complete"

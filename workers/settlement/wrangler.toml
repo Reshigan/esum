@@ -1,0 +1,24 @@
+name = "esum-settlement"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "energy_trading_db"
+database_id = "aa6ba829-a8b9-4b36-932b-8509f7432e7b"
+
+[[r2_buckets]]
+binding = "INVOICES"
+bucket_name = "energy-invoices"
+
+[[queues.producers]]
+binding = "NOTIFICATION_QUEUE"
+queue = "notification-dispatch"
+
+[[queues.producers]]
+binding = "SETTLEMENT_QUEUE"
+queue = "settlement-processing"
+
+[vars]
+ENVIRONMENT = "production"
