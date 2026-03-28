@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
-import { DEMO_ACCOUNTS, getCredentialForAccount } from "@/lib/demo-accounts";
 
 const LogoSvg = () => (
   <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
@@ -17,18 +16,18 @@ const LogoSvg = () => (
 export default function LoginPage() {
   const [showSecret, setShowSecret] = useState(false);
   const [email, setEmail] = useState("");
-  const [credential, setCredential] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
 
-    const result = login(email, credential);
+    const result = await login(email, password);
     if (result.success) {
       router.push("/dashboard");
     } else {
@@ -73,9 +72,9 @@ export default function LoginPage() {
               <div className="relative">
                 <input
                   type={showSecret ? "text" : "password"}
-                  placeholder="Enter credential"
-                  value={credential}
-                  onChange={(e) => setCredential(e.target.value)}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition placeholder:text-gray-300 pr-10"
                 />
@@ -99,23 +98,6 @@ export default function LoginPage() {
               {isSubmitting ? "Signing in..." : "Sign In"}
             </button>
           </form>
-
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <p className="text-xs text-gray-400 text-center mb-3">Demo Accounts</p>
-            <div className="space-y-2">
-              {DEMO_ACCOUNTS.map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  onClick={() => { setEmail(acc.email); setCredential(getCredentialForAccount(acc)); }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition text-xs"
-                >
-                  <span className="text-gray-600 font-medium">{acc.role}</span>
-                  <span className="text-gray-400">{acc.email}</span>
-                </button>
-              ))}
-            </div>
-          </div>
 
           <p className="text-sm text-gray-400 text-center mt-6">
             Don&apos;t have an account?{" "}
