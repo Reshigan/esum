@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from "react";
 
 export type ToastType = "success" | "error" | "info" | "warning";
 
@@ -65,6 +65,11 @@ const typeIcons: Record<ToastType, JSX.Element> = {
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const showToast = useCallback(
     (type: ToastType, message: string, duration: number = 5000) => {
@@ -104,6 +109,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
+
+  // Don't render toasts during SSR
+  if (!isClient) {
+    return <ToastContext.Provider value={{ showToast, showSuccess, showError, showInfo, showWarning, dismissToast }}>{children}</ToastContext.Provider>;
+  }
 
   return (
     <ToastContext.Provider

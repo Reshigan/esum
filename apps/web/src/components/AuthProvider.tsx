@@ -47,6 +47,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === "undefined") return;
+    
     try {
       const token = localStorage.getItem(AUTH_TOKEN_KEY);
       const storedUser = localStorage.getItem(AUTH_USER_KEY);
@@ -64,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || typeof window === "undefined") return;
     const isPublic = PUBLIC_PATHS.includes(pathname || "");
     if (!user && !isPublic) {
       router.replace("/login");
@@ -109,9 +112,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       apiClient.setToken(null);
       setUser(null);
       setOrganisation(null);
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(AUTH_USER_KEY);
-      localStorage.removeItem(AUTH_ORG_KEY);
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(AUTH_USER_KEY);
+        localStorage.removeItem(AUTH_ORG_KEY);
+      }
       router.replace("/login");
     }
   }, [router]);
