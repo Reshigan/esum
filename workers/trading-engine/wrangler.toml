@@ -22,8 +22,14 @@ queue = "notification-dispatch"
 
 [durable_objects]
 bindings = [
-  { name = "ORDER_BOOK", class_name = "OrderBook" }
+  { name = "ORDER_BOOK", class_name = "OrderBook" },
+  { name = "AUCTION_MANAGER", class_name = "AuctionManager" },
+  { name = "NEGOTIATION_ROOM", class_name = "NegotiationRoom" }
 ]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["OrderBook", "AuctionManager", "NegotiationRoom"]
 
 [vars]
 ENVIRONMENT = "production"
