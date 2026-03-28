@@ -564,6 +564,41 @@ export class NegotiationRoom {
 }
 
 // ============================================================================
+// WORKER DEFAULT EXPORT (required for ES module format with Durable Objects)
+// ============================================================================
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    // Route to appropriate Durable Object
+    if (path.startsWith('/orderbook') || path.startsWith('/order') || path.startsWith('/cancel') || path === '/trades') {
+      const instrumentId = url.searchParams.get('instrument_id') || 'default';
+      const id = env.ORDER_BOOK.idFromName(instrumentId);
+      const stub = env.ORDER_BOOK.get(id);
+      return stub.fetch(request);
+    }
+
+    if (path.startsWith('/auction')) {
+      const auctionId = url.searchParams.get('auction_id') || 'default';
+      const id = env.AUCTION_MANAGER.idFromName(auctionId);
+      const stub = env.AUCTION_MANAGER.get(id);
+      return stub.fetch(request);
+    }
+
+    if (path.startsWith('/negotiation') || path.startsWith('/message') || path.startsWith('/propose') || path.startsWith('/accept')) {
+      const negotiationId = url.searchParams.get('negotiation_id') || 'default';
+      const id = env.NEGOTIATION_ROOM.idFromName(negotiationId);
+      const stub = env.NEGOTIATION_ROOM.get(id);
+      return stub.fetch(request);
+    }
+
+    return Response.json({ service: 'esum-trading-engine', status: 'ok' });
+  }
+};
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
