@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
+import { useToast } from "@/components/ToastProvider";
+import { SignaturePad } from "@esum/ui-components";
 
 interface Contract {
   id: string;
@@ -43,12 +45,14 @@ interface SignatureData {
 export default function ContractSignPage() {
   const params = useParams();
   const router = useRouter();
+  const { showError, showSuccess } = useToast();
   const contractId = params.id as string;
 
   const [contract, setContract] = useState<Contract | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [signatureId, setSignatureId] = useState<string | null>(null);
+  const signaturePadRef = useRef<HTMLCanvasElement>(null);
   
   // Signature state
   const [consentGiven, setConsentGiven] = useState(false);
@@ -156,7 +160,7 @@ export default function ContractSignPage() {
       // Refresh contract data
       setTimeout(fetchContract, 1000);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to sign contract");
+      showError(err instanceof Error ? err.message : "Failed to sign contract");
     } finally {
       setSigning(false);
     }
@@ -183,10 +187,10 @@ export default function ContractSignPage() {
         throw new Error("Failed to decline signature");
       }
 
-      alert("Signature declined");
+      showSuccess("Signature declined successfully");
       router.push("/contracts");
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to decline");
+      showError(err instanceof Error ? err.message : "Failed to decline signature");
     }
   }
 
@@ -384,6 +388,18 @@ export default function ContractSignPage() {
                     </div>
 
                     <div className="space-y-3">
+                      <div className="p-4 bg-white border border-gray-200 rounded-lg">
+                        <h3 className="text-sm font-medium text-gray-900 mb-2">Signature</h3>
+                        <SignaturePad 
+                          onEnd={() => {
+                            // Enable consent when user starts drawing
+                            if (!consentGiven) {
+                              setConsentGiven(true);
+                            }
+                          }}
+                        />
+                      </div>
+
                       <div className="flex items-start">
                         <input
                           type="checkbox"

@@ -391,6 +391,10 @@ Input.displayName = 'Input';
 // EXPORT ALL COMPONENTS
 // ============================================================================
 
+// ============================================================================
+// EXPORT ALL COMPONENTS
+// ============================================================================
+
 export {
   StatusBadge,
   CurrencyDisplay,
@@ -404,3 +408,5 @@ export {
   Button,
   Input
 };
+
+export { SignaturePad } from './SignaturePad';
